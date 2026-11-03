@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>包記炊粿：顧粿沒那麼簡單｜傳統菜頭粿製作小遊戲</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- 背景蒸氣粒子畫布 -->
+  <canvas id="bg-canvas"></canvas>
+
+  <!-- 頂部導覽列 -->
+  <header class="topbar">
+    <div class="brand" id="btn-home" title="回到首頁">
+      <img src="正面.jfif" alt="粿" class="brand-icon" />
+      <span>包記炊粿・顧粿沒那麼簡單</span>
+    </div>
+    <div class="topbar-actions">
+      <button id="btn-recipe" class="pill-btn" type="button">📜 炊粿食譜秘笈</button>
+      <button id="btn-sound" class="pill-btn" type="button">🔊 音效：開</button>
+    </div>
+  </header>
+
+  <main class="game-shell">
+    <!-- 首頁畫面 -->
+    <section id="screen-title" class="screen active">
+      <div class="hero-grid">
+        <div class="hero-card-showcase">
+          <div class="flip-card" id="hero-flip-card" title="點擊翻面查看正反面素材">
+            <div class="flip-card-inner">
+              <div class="flip-card-front">
+                <img src="背面.jfif" alt="包記炊粿 顧粿沒那麼簡單" />
+                <span class="flip-hint">👆 點擊翻面看「正面」</span>
+              </div>
+              <div class="flip-card-back">
+                <img src="正面.jfif" alt="熱騰騰菜頭粿" />
+                <span class="flip-hint">👆 點擊翻面看「背面」</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-copy">
+          <div class="badge-tag">台灣古早味職人模擬遊戲</div>
+          <h1>包記炊粿<br /><span class="accent-red">顧粿沒那麼簡單！</span></h1>
+          <p class="hero-desc">
+            跟著包老闆從零開始製作傳統台式<strong>菜頭粿（蘿蔔糕）</strong>！<br />
+            掌握<strong>「蘿蔔與在來米粉 3:1 黃金比例」</strong>、<strong>「冷水調漿」</strong>、<strong>「微火糊化」</strong>與最考驗功夫的<strong>「蒸籠顧火針試法」</strong>，炊出香氣四溢的極品菜頭粿！
+          </p>
+
+          <div class="steps-preview">
+            <div class="step-chip"><span>1</span> 刨蘿蔔絲</div>
+            <div class="step-chip"><span>2</span> 冷水調漿</div>
+            <div class="step-chip"><span>3</span> 炒料糊化</div>
+            <div class="step-chip"><span>4</span> 蒸籠顧粿</div>
+            <div class="step-chip"><span>5</span> 切塊香煎</div>
+          </div>
+
+          <div class="hero-cta-row">
+            <button id="btn-start-game" class="primary-btn" type="button">🔥 開始炊粿挑戰</button>
+            <button id="btn-open-recipe-hero" class="secondary-btn" type="button">📖 先看製作流程</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 遊戲主舞台 -->
+    <section id="screen-play" class="screen">
+      <!-- 關卡進度條與老闆對話框 -->
+      <div class="hud-header">
+        <div class="stage-progress">
+          <div class="stage-node active" data-stage="1">1. 刨絲出水</div>
+          <div class="stage-node" data-stage="2">2. 黃金米漿</div>
+          <div class="stage-node" data-stage="3">3. 翻炒糊化</div>
+          <div class="stage-node" data-stage="4">4. 蒸籠顧粿</div>
+          <div class="stage-node" data-stage="5">5. 冷卻切塊</div>
+        </div>
+        <div class="score-box">
+          <span>美味評價</span>
+          <strong id="hud-score">100</strong>
+          <small>分</small>
+        </div>
+      </div>
+
+      <!-- 包老闆指導列 -->
+      <div class="boss-banner">
+        <div class="boss-avatar-wrap">
+          <img src="背面.jfif" alt="包老闆" class="boss-avatar" />
+        </div>
+        <div class="boss-speech">
+          <div class="boss-name" id="stage-title">第一關：削皮刨絲（備料 1200g 白蘿蔔）</div>
+          <p id="boss-dialogue">「做菜頭粿，白蘿蔔要選重手清甜的！快在刨絲器上左右滑動，把白蘿蔔刨成細絲！」</p>
+        </div>
+        <div class="timer-pill">
+          ⏱️ <span id="stage-timer">25.0</span>s
+        </div>
+      </div>
+
+      <!-- 互動工作台區 -->
+      <div class="workbench" id="workbench">
+        <!-- 各關卡動態注入於此 -->
+      </div>
+    </section>
+
+    <!-- 結算畫面 -->
+    <section id="screen-result" class="screen">
+      <div class="result-container">
+        <div class="result-visual">
+          <div class="flip-card" id="result-flip-card" title="點擊翻轉包記炊粿紀念卡">
+            <div class="flip-card-inner">
+              <div class="flip-card-front">
+                <img src="正面.jfif" alt="菜頭粿成品" />
+                <span class="flip-hint">👆 點擊翻看包老闆認證</span>
+              </div>
+              <div class="flip-card-back">
+                <img src="背面.jfif" alt="包記炊粿 顧粿沒那麼簡單" />
+                <span class="flip-hint">👆 點擊翻看熱騰騰菜頭粿</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="result-details">
+          <div class="badge-tag" id="result-rank-badge">特級炊粿職人</div>
+          <h2 id="result-title">香氣四溢！極品包記菜頭粿出爐！</h2>
+          <p id="result-comment" class="result-comment"></p>
+
+          <div class="score-breakdown" id="score-breakdown"></div>
+
+          <div class="hero-cta-row">
+            <button id="btn-retry" class="primary-btn" type="button">🔄 再炊一籠</button>
+            <button id="btn-result-recipe" class="secondary-btn" type="button">📜 查看完整食譜</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 傳統菜頭粿食譜秘笈 Modal -->
+  <div id="recipe-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <img src="正面.jfif" alt="粿" class="modal-icon" />
+          <div>
+            <h3>傳統古早味「菜頭粿」製作流程秘笈</h3>
+            <p>掌握 3:1 黃金比例與糊化關鍵，在家也能做出真材實料蘿蔔糕</p>
+          </div>
+        </div>
+        <button id="btn-close-modal" class="close-btn" type="button">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="recipe-banner">
+          <img src="背面.jfif" alt="包記炊粿" />
+          <div class="recipe-ratios">
+            <h4>🥣 黃金比例食材準備</h4>
+            <ul>
+              <li><strong>白蘿蔔（去皮淨重）：</strong>1200 克（約大條 2 根，與在來米粉為 <strong>3 : 1</strong> 黃金比例）</li>
+              <li><strong>在來米粉：</strong>400 克</li>
+              <li><strong>冷水（調米漿用）：</strong>400 ～ 500 c.c.（依蘿蔔含水量微調，<strong>嚴禁用熱水</strong>以免結塊）</li>
+              <li><strong>古早味調味：</strong>油蔥酥 2 大匙、鹽巴 1.5 小匙、白胡椒粉 1 小匙</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="recipe-steps-grid">
+          <div class="recipe-step-card">
+            <span class="step-num">步驟一</span>
+            <h5>處理白蘿蔔（刨絲與悶煮出水）</h5>
+            <p>白蘿蔔洗淨去皮刨成細絲。熱鍋下少許油爆香<strong>油蔥酥</strong>，放入蘿蔔絲、鹽巴與白胡椒粉拌炒，蓋鍋中小火悶煮 5～10 分鐘至半透明軟化、釋放天然清甜蘿蔔水。</p>
+          </div>
+          <div class="recipe-step-card">
+            <span class="step-num">步驟二</span>
+            <h5>調製在來米漿（冷水溶解）</h5>
+            <p>取大盆將 <strong>400g 在來米粉</strong> 加入 <strong>400c.c. 冷水</strong>，攪拌至完全溶解無粉粒。切記不可用熱水，否則粉粒外熟內生會結塊。</p>
+          </div>
+          <div class="recipe-step-card">
+            <span class="step-num">步驟三</span>
+            <h5>關鍵「糊化」過程（成敗關鍵）</h5>
+            <p>轉<strong>小火</strong>將米漿分次倒入蘿蔔絲鍋中，用鍋鏟<strong>不停快速翻炒攪拌</strong>。隨溫度升高，粉漿吸水糊化成濃稠「半熟白糊狀（米糰）」，阻力變大成團時立刻關火。</p>
+          </div>
+          <div class="recipe-step-card">
+            <span class="step-num">步驟四</span>
+            <h5>入模壓實與大火炊粿</h5>
+            <p>蒸模鋪烘焙紙或抹油，倒入米糊<strong>壓實排空空氣並抹平表面</strong>。水滾後入蒸籠以<strong>中大火蒸 50～60 分鐘</strong>（或電鍋外鍋 3～5 杯水跳起悶 15 分鐘）。以<strong>竹籤插入中心</strong>拔出無沾黏白漿即熟透！</p>
+          </div>
+          <div class="recipe-step-card full-width">
+            <span class="step-num">步驟五</span>
+            <h5>完全放涼定型與香煎「恰恰」</h5>
+            <p>剛出爐的菜頭粿非常柔軟脆弱，必須<strong>完全放涼定型</strong>後再脫模切片。下平底鍋煎至兩面金黃赤赤（恰恰），淋上蒜蓉醬油膏即可享用！</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>
+
