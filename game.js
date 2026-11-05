@@ -1128,12 +1128,32 @@ function updateTopAndSidebarHUD() {
 
 /* =========================================================
    繪製單一整合式 2.5D 等距斜角廚房房間場景 (1120 x 630)
+   支援手機直立「智慧放大跟隨鏡頭 (Smart Zoom Camera)」，畫面不再小小一塊！
 ========================================================= */
 function renderIsoKitchenScene(t) {
   const canvas = document.getElementById("action-canvas");
   const ctx = canvas.getContext("2d");
   const W = canvas.width;
   const H = canvas.height;
+
+  ctx.save();
+
+  // 手機直立或窄螢幕時，自動拉近鏡頭放大 1.45 倍並平滑跟隨包老闆，讓角色、家具與字體超大超清楚！
+  const isMobilePortrait = window.innerWidth <= 820;
+  if (isMobilePortrait) {
+    const zoom = 1.44;
+    // 以廚房核心工作區與角色位置加權作為鏡頭中心
+    const focusX = State.player.x * 0.72 + 505 * 0.28;
+    const focusY = State.player.y * 0.72 + 340 * 0.28;
+    const halfW = W / (2 * zoom);
+    const halfH = H / (2 * zoom);
+    const camX = Math.max(halfW, Math.min(W - halfW, focusX));
+    const camY = Math.max(halfH, Math.min(H - halfH, focusY));
+
+    ctx.translate(W / 2, H / 2);
+    ctx.scale(zoom, zoom);
+    ctx.translate(-camX, -camY);
+  }
 
   // 1. 繪製完整無縫的 2.5D 等距斜角廚房全景背景圖 (iso_kitchen_room.jpg)
   if (Images.isoRoom.complete) {
@@ -1165,7 +1185,7 @@ function renderIsoKitchenScene(t) {
     else drawIsoFullBodyPlayer(ctx, t);
   }
 
-  // 5. 繪製懸浮於各 2.5D 家具上方的小巧狀態牌與進度條（不遮擋家具本體！）
+  // 5. 繪製懸浮於各 2.5D 家具上方的大字狀態牌與進度條
   for (const st of ISO_STATIONS) {
     const isNear = nearestSt && nearestSt.id === st.id;
     drawFloatingStationBadge(ctx, st, isNear, t);
@@ -1184,6 +1204,8 @@ function renderIsoKitchenScene(t) {
     ctx.fillText(ft.text, ft.x, ft.y);
     ctx.restore();
   }
+
+  ctx.restore();
 }
 
 function drawDynamicRoomEffects(ctx, t) {
@@ -1734,51 +1756,11 @@ window.addEventListener("DOMContentLoaded", () => {
     if (k === "d" || e.key === "ArrowRight") State.keys.right = false;
   });
 
-  // 點擊 2.5D 房間畫布：點家具或地板圓圈自動走過去並操作！
-  const actionCanvas = document.getElementById("action-canvas");
-  actionCanvas.addEventListener("pointerdown", (e) => {
-    if (!State.running || State.inRush) return;
-    const rect = actionCanvas.getBoundingClientRect();
-    const cx = ((e.clientX - rect.left) / rect.width) * actionCanvas.width;
-    const cy = ((e.clientY - rect.top) / rect.height) * actionCanvas.height;
-
-    // 1. 是否點在貪吃鼠身上
-    for (const rat of State.rats) {
-      if (Math.hypot(cx - rat.x, cy - rat.y) < 52) {
-        State.player.targetX = rat.x;
-        State.player.targetY = rat.y;
-        if (Math.hypot(State.player.x - rat.x, State.player.y - rat.y) < 92) {
-          triggerInteract();
-        }
-        return;
-      }
-    }
-
-    // 2. 是否點在某個 2.5D 家具標籤或地板圓圈附近 (加大手機直立觸控判定範圍！)
-    let clickedStation = null;
-    for (const st of ISO_STATIONS) {
-      const distLabel = Math.hypot(cx - st.labelX, cy - st.labelY);
-      const distStand = Math.hypot(cx - st.standX, cy - st.standY);
-      if (distLabel < 115 || distStand < 85) {
-        clickedStation = st;
-        break;
-      }
-    }
-
-    if (clickedStation) {
-      goToAndInteractStation(clickedStation);
-    } else {
-      State.player.targetX = Math.max(150, Math.min(840, cx));
-      State.player.targetY = Math.max(275, Math.min(545, cy));
-      State.player.autoInteractStation = null;
-    }
-  });
-
-  // 電腦與手機直立皆適用的「5大工作站一鍵直達按鈕列」
+  // 取消直接觸控點擊畫布移動，統一使用畫布下方的「實體十字方向鍵、A/B 動作鍵與工作站實體快捷鍵」操作！
   function goToAndInteractStation(st) {
     if (!State.running || State.inRush || !st) return;
     const d = Math.hypot(State.player.x - st.standX, State.player.y - st.standY);
-    if (d < 96) {
+    if (d < 98) {
       interactWithIsoStation(st);
       updateTopAndSidebarHUD();
     } else {
@@ -1790,31 +1772,41 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 
   document.querySelectorAll(".quick-st-btn").forEach((btn) => {
-    btn.addEventListener("click", () => {
+    btn.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
       const stId = btn.dataset.st;
       const st = ISO_STATIONS.find((s) => s.id === stId);
       goToAndInteractStation(st);
     });
   });
 
-  // 畫面下方虛擬搖桿與動作按鈕
+  // 畫面下方實體十字方向鍵與街機 A/B 動作大按鍵
   document.querySelectorAll(".dpad-btn").forEach((btn) => {
     const dir = btn.dataset.dir;
     const startDir = (e) => {
       e.preventDefault();
       State.keys[dir] = true;
+      btn.classList.add("pressed");
     };
     const endDir = (e) => {
       e.preventDefault();
       State.keys[dir] = false;
+      btn.classList.remove("pressed");
     };
     btn.addEventListener("pointerdown", startDir);
     btn.addEventListener("pointerup", endDir);
     btn.addEventListener("pointerleave", endDir);
+    btn.addEventListener("pointercancel", endDir);
   });
 
-  document.getElementById("btn-act-main").addEventListener("click", triggerInteract);
-  document.getElementById("btn-act-dash").addEventListener("click", triggerDash);
+  document.getElementById("btn-act-main").addEventListener("pointerdown", (e) => {
+    e.preventDefault();
+    triggerInteract();
+  });
+  document.getElementById("btn-act-dash").addEventListener("pointerdown", (e) => {
+    e.preventDefault();
+    triggerDash();
+  });
 
   // 瘋狂點擊出貨視窗
   document.getElementById("rush-click-zone").addEventListener("pointerdown", handleRushTap);

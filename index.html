@@ -179,7 +179,7 @@
             <canvas id="action-canvas" width="1120" height="630"></canvas>
           </div>
 
-          <!-- 電腦與手機直立皆適用的獨立操控列（不遮擋 2.5D 廚房畫面！支援一鍵直達工作站） -->
+          <!-- 街機掌機式實體按鍵座（不點畫布！全靠下方實體十字鍵＋A/B大按鍵＋5大工作站實體快捷鍵操控） -->
           <div class="control-dock">
             <div class="quick-station-bar">
               <button class="quick-st-btn" data-st="PREP_STATION" type="button">① 刨絲調漿</button>
@@ -189,21 +189,27 @@
               <button class="quick-st-btn" data-st="CUT_DELIVER_STATION" type="button">④ 切塊出貨</button>
             </div>
 
-            <div class="touch-hud">
-              <div class="dpad-group">
-                <button class="dpad-btn up" data-dir="up" type="button">▲</button>
-                <div class="dpad-mid">
-                  <button class="dpad-btn left" data-dir="left" type="button">◀</button>
-                  <button class="dpad-btn down" data-dir="down" type="button">▼</button>
-                  <button class="dpad-btn right" data-dir="right" type="button">▶</button>
-                </div>
+            <div class="gamepad-hud">
+              <!-- 左手：立體十字方向鍵 (D-Pad) -->
+              <div class="dpad-cross">
+                <button class="dpad-btn up" data-dir="up" type="button" aria-label="上">▲</button>
+                <button class="dpad-btn left" data-dir="left" type="button" aria-label="左">◀</button>
+                <div class="dpad-center">✚</div>
+                <button class="dpad-btn right" data-dir="right" type="button" aria-label="右">▶</button>
+                <button class="dpad-btn down" data-dir="down" type="button" aria-label="下">▼</button>
               </div>
+
+              <!-- 右手：實體街機 B 鍵 (衝刺) ＆ 超大 A 鍵 (拿取/操作/打老鼠) -->
               <div class="action-btns-group">
-                <button id="btn-act-dash" class="act-circle-btn dash-btn" type="button">
-                  💨 衝刺<small>[Shift/K]</small>
+                <button id="btn-act-dash" class="arcade-btn dash-btn" type="button">
+                  <span class="btn-key-badge">B</span>
+                  <span class="btn-main-label">💨 衝刺</span>
+                  <small>[Shift / K]</small>
                 </button>
-                <button id="btn-act-main" class="act-circle-btn interact-btn" type="button">
-                  🖐️ 拿取 / 操作<small>[空白鍵/J]</small>
+                <button id="btn-act-main" class="arcade-btn interact-btn" type="button">
+                  <span class="btn-key-badge">A</span>
+                  <span class="btn-main-label">🖐️ 操作 / 打鼠</span>
+                  <small>[空白鍵 / J]</small>
                 </button>
               </div>
             </div>
