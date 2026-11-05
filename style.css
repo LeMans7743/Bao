@@ -1,17 +1,28 @@
+/* =========================================================
+   包記炊粿：手感炊粿大挑戰 CSS 樣式
+   設計語言：台式古早味街頭紅磚、溫潤木紋、現代精緻扁平卡片、手遊高對比視覺
+========================================================= */
+
 :root {
-  --bg-cream: #fdf5e8;
-  --bg-warm: #f4dfc6;
+  --bg-dark: #1f140e;
+  --bg-cream: #fbf5ea;
+  --bg-warm: #f4dfc7;
   --red-main: #c82829;
-  --red-dark: #8e1516;
+  --red-dark: #8c1718;
+  --red-bright: #e74c3c;
   --wood-gold: #c88a4b;
-  --wood-dark: #4a2814;
+  --wood-dark: #4a2815;
   --ink-dark: #231710;
-  --ink-muted: #6e5849;
-  --leaf-green: #27ae60;
-  --gold-accent: #f1c40f;
-  --card-bg: #fffdf9;
-  --shadow-soft: 0 8px 24px rgba(68, 36, 14, 0.12);
-  --shadow-strong: 0 12px 32px rgba(35, 23, 16, 0.3);
+  --ink-muted: #6e5544;
+  --green-main: #27ae60;
+  --gold-main: #f1c40f;
+  --gold-dark: #b8650a;
+  --card-bg: #ffffff;
+  --radius-lg: 18px;
+  --radius-md: 12px;
+  --shadow-sm: 0 4px 12px rgba(35, 23, 16, 0.08);
+  --shadow-md: 0 8px 24px rgba(35, 23, 16, 0.16);
+  --shadow-lg: 0 16px 36px rgba(18, 10, 5, 0.35);
 }
 
 * {
@@ -21,6 +32,7 @@
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 html, body {
@@ -29,11 +41,11 @@ html, body {
   overflow: hidden;
   position: fixed;
   font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", -apple-system, sans-serif;
-  background: #20130b;
+  background: var(--bg-dark);
   color: var(--ink-dark);
 }
 
-/* 畫面容器控制 */
+/* 畫面切換 */
 .screen {
   display: none;
   width: 100%;
@@ -41,9 +53,6 @@ html, body {
   position: absolute;
   top: 0;
   left: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
 }
 
 .screen.active {
@@ -51,50 +60,61 @@ html, body {
   flex-direction: column;
 }
 
-/* =========================================================
-   主畫面 (Screen Title / Hub)
-========================================================= */
-#screen-title {
-  background: radial-gradient(circle at 50% 15%, #fffdf8 0%, var(--bg-cream) 55%, var(--bg-warm) 100%);
-  padding: 1rem 1rem 2.5rem;
+/* 捲動容器 (供首頁與結算頁面使用) */
+.screen-scroll-wrap {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  background: radial-gradient(circle at 50% 10%, #fffdf8 0%, var(--bg-cream) 60%, var(--bg-warm) 100%);
+  padding: 0.9rem 1rem 3rem;
   max-width: 540px;
   margin: 0 auto;
 }
 
-.hub-header {
+/* =========================================================
+   首頁 (Title Hub)
+========================================================= */
+
+.app-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.4rem 0 0.8rem;
+}
+
+.app-brand {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.5rem 0.2rem 0.8rem;
 }
 
-.brand-icon {
-  width: 52px;
-  height: 52px;
+.app-logo {
+  width: 48px;
+  height: 48px;
   border-radius: 14px;
-  border: 3px solid var(--red-main);
+  border: 2.5px solid var(--red-main);
   object-fit: cover;
   background: #fff;
   box-shadow: 0 4px 10px rgba(200, 40, 41, 0.25);
 }
 
-.brand-text h1 {
-  font-size: 1.5rem;
+.app-title {
+  font-size: 1.45rem;
   font-weight: 900;
   color: var(--red-main);
-  line-height: 1.1;
   letter-spacing: 1px;
+  line-height: 1.15;
 }
 
-.brand-text p {
-  font-size: 0.88rem;
+.app-subtitle {
+  font-size: 0.8rem;
   font-weight: 800;
   color: var(--wood-dark);
-  margin-top: 2px;
 }
 
-.icon-btn {
-  margin-left: auto;
+.icon-circle-btn {
   width: 44px;
   height: 44px;
   border-radius: 50%;
@@ -107,249 +127,321 @@ html, body {
   cursor: pointer;
   box-shadow: 0 3px 0 var(--wood-dark);
   touch-action: manipulation;
+  transition: transform 0.08s ease;
 }
 
-.icon-btn:active {
+.icon-circle-btn:active {
   transform: translateY(2px);
   box-shadow: 0 1px 0 var(--wood-dark);
 }
 
-.hero-card {
+/* 首頁橫幅 */
+.hero-banner {
   position: relative;
-  border: 3px solid var(--wood-dark);
-  border-radius: 18px;
+  border: 2.5px solid var(--wood-dark);
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  margin-bottom: 1rem;
-  box-shadow: var(--shadow-soft);
-  background: #fff;
+  margin-bottom: 0.9rem;
+  box-shadow: var(--shadow-sm);
+  background: #000;
 }
 
-.hero-card img {
+.hero-banner-img {
   width: 100%;
-  height: 160px;
+  height: 145px;
   object-fit: cover;
   display: block;
+  opacity: 0.95;
 }
 
-.hero-caption {
-  padding: 0.65rem 0.85rem;
-  background: #fff;
+.hero-banner-glass {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(35, 23, 16, 0.15) 0%, rgba(35, 23, 16, 0.85) 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 0.85rem;
+}
+
+.hero-pill {
+  align-self: flex-start;
+  background: var(--red-main);
+  color: #fff;
+  font-size: 0.76rem;
+  font-weight: 900;
+  padding: 0.18rem 0.55rem;
+  border-radius: 999px;
+  margin-bottom: 0.35rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.hero-text {
+  color: #fff;
   font-size: 0.88rem;
   font-weight: 800;
-  color: var(--ink-dark);
-  line-height: 1.45;
-  border-top: 2px solid var(--wood-gold);
+  line-height: 1.35;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
 }
 
-.name-row {
+/* 卡片容器 */
+.card {
+  background: var(--card-bg);
+  border: 2.5px solid var(--wood-dark);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 0.95rem;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 0.9rem;
+}
+
+.player-name-card {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #fff;
-  border: 2.5px solid var(--wood-dark);
-  border-radius: 14px;
-  padding: 0.65rem 0.9rem;
-  font-size: 0.95rem;
+}
+
+.field-label {
   font-weight: 900;
-  margin-bottom: 1rem;
-  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.08);
+  font-size: 0.95rem;
+  color: var(--ink-dark);
+}
+
+.input-wrap {
+  text-align: right;
 }
 
 #player-name-input {
   border: none;
   border-bottom: 2px dashed var(--red-main);
   background: transparent;
-  font-size: 1.05rem;
+  font-size: 1.1rem;
   font-weight: 900;
   color: var(--red-main);
   text-align: right;
-  width: 140px;
+  width: 120px;
   outline: none;
   user-select: text;
   -webkit-user-select: text;
 }
 
-.section-title {
+.input-hint {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--ink-muted);
+}
+
+.section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin: 0.2rem 0 0.5rem;
+}
+
+.section-head h2 {
   font-size: 1.15rem;
   font-weight: 900;
-  margin-bottom: 0.6rem;
   color: var(--ink-dark);
 }
 
-/* 關卡清單卡片 */
-.level-list {
+.section-sub {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--ink-muted);
+}
+
+/* 關卡選擇卡片 */
+.level-cards-grid {
   display: flex;
   flex-direction: column;
   gap: 0.65rem;
-  margin-bottom: 1.1rem;
+  margin-bottom: 1rem;
 }
 
 .level-card {
   display: flex;
   align-items: center;
-  gap: 0.8rem;
+  gap: 0.75rem;
   background: #fff;
-  border: 2.5px solid #d4c2a5;
-  border-radius: 14px;
-  padding: 0.75rem 0.9rem;
+  border: 2.5px solid #dcd1be;
+  border-radius: var(--radius-md);
+  padding: 0.75rem 0.85rem;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.12s ease;
   touch-action: manipulation;
 }
 
 .level-card.selected {
   border-color: var(--red-main);
-  background: #fff8eb;
-  box-shadow: 0 0 0 3px rgba(200, 40, 41, 0.25), 0 5px 12px rgba(200, 40, 41, 0.15);
+  background: #fff9ee;
+  box-shadow: 0 0 0 3px rgba(200, 40, 41, 0.22), 0 6px 14px rgba(200, 40, 41, 0.14);
   transform: translateY(-1px);
 }
 
-.level-badge {
-  width: 48px;
-  height: 48px;
+.level-badge-box {
+  width: 50px;
+  height: 50px;
   border-radius: 12px;
-  background: linear-gradient(135deg, #ffd32a, #f39c12);
+  background: linear-gradient(135deg, #ffd32a 0%, #f39c12 100%);
   border: 2px solid var(--wood-dark);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: 0.82rem;
+  flex-shrink: 0;
   font-weight: 900;
   color: var(--ink-dark);
-  flex-shrink: 0;
+  box-shadow: 0 3px 0 var(--wood-dark);
 }
 
-.level-badge span {
-  font-size: 1rem;
+.level-badge-id {
+  font-size: 0.7rem;
+  line-height: 1;
 }
 
-.level-info {
+.level-badge-icon {
+  font-size: 1.15rem;
+  line-height: 1.1;
+}
+
+.level-content {
   flex: 1;
+  min-width: 0;
 }
 
-.level-title-row {
+.level-header-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-.level-name {
+.level-title {
   font-size: 1.05rem;
   font-weight: 900;
   color: var(--ink-dark);
 }
 
-.level-stars {
-  font-size: 0.92rem;
-  color: #f39c12;
+.level-tag {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--red-main);
 }
 
-.level-desc {
-  font-size: 0.8rem;
+.level-sub-desc {
+  font-size: 0.78rem;
   font-weight: 700;
   color: var(--ink-muted);
   margin-top: 2px;
   line-height: 1.35;
 }
 
-/* 按鈕風格 */
-.primary-btn {
-  background: linear-gradient(180deg, #ea4243 0%, var(--red-main) 100%);
+/* 巨型大按鈕 */
+.btn-giant-primary {
+  width: 100%;
+  background: linear-gradient(180deg, #e74c3c 0%, var(--red-main) 100%);
   color: #fff;
-  border: 2.5px solid var(--red-dark);
-  border-radius: 14px;
+  border: 3px solid var(--red-dark);
+  border-radius: var(--radius-md);
   font-weight: 900;
-  font-size: 1.15rem;
-  padding: 0.85rem 1.2rem;
+  font-size: 1.25rem;
+  padding: 0.95rem 1rem;
   cursor: pointer;
-  box-shadow: 0 5px 0 var(--red-dark), 0 8px 18px rgba(200, 40, 41, 0.35);
+  box-shadow: 0 5px 0 var(--red-dark), 0 10px 20px rgba(200, 40, 41, 0.35);
   text-align: center;
   touch-action: manipulation;
   transition: transform 0.08s ease, box-shadow 0.08s ease;
+  margin-bottom: 0.9rem;
 }
 
-.primary-btn.big {
-  width: 100%;
-  font-size: 1.3rem;
-  padding: 1rem;
-  margin-bottom: 0.85rem;
-}
-
-.primary-btn.gold {
-  background: linear-gradient(180deg, #ffd32a 0%, #f39c12 100%);
-  color: var(--ink-dark);
-  border-color: #b8650a;
-  box-shadow: 0 5px 0 #b8650a, 0 8px 18px rgba(243, 156, 18, 0.35);
-}
-
-.primary-btn:active {
+.btn-giant-primary:active {
   transform: translateY(3px);
   box-shadow: 0 2px 0 var(--red-dark);
 }
 
-.primary-btn.gold:active {
-  box-shadow: 0 2px 0 #b8650a;
+.btn-giant-primary.gold {
+  background: linear-gradient(180deg, #ffd32a 0%, #f39c12 100%);
+  color: var(--ink-dark);
+  border-color: var(--gold-dark);
+  box-shadow: 0 5px 0 var(--gold-dark), 0 10px 20px rgba(243, 156, 18, 0.35);
 }
 
-.hub-actions {
+.btn-giant-primary.gold:active {
+  box-shadow: 0 2px 0 var(--gold-dark);
+}
+
+/* 輔助按鈕雙欄 */
+.hub-aux-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0.65rem;
-  margin-bottom: 1.2rem;
+  margin-bottom: 1rem;
 }
 
-.secondary-btn {
+.btn-aux {
   background: #fff;
   border: 2.5px solid var(--wood-dark);
   color: var(--ink-dark);
   font-weight: 900;
-  font-size: 0.98rem;
+  font-size: 0.92rem;
   padding: 0.65rem;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   cursor: pointer;
   box-shadow: 0 3px 0 var(--wood-dark);
   text-align: center;
   touch-action: manipulation;
 }
 
-.secondary-btn:active {
+.btn-aux:active {
   transform: translateY(2px);
   box-shadow: 0 1px 0 var(--wood-dark);
 }
 
-.panel {
-  background: #fff;
-  border: 2.5px solid var(--wood-dark);
-  border-radius: 16px;
-  padding: 0.9rem;
-  box-shadow: var(--shadow-soft);
-  margin-top: 0.5rem;
-}
-
-.panel h3 {
+.btn-aux.big {
+  width: 100%;
+  padding: 0.85rem;
   font-size: 1.05rem;
-  font-weight: 900;
-  margin-bottom: 0.6rem;
-  border-bottom: 2px solid #ecd8bf;
-  padding-bottom: 0.4rem;
 }
 
-.lb-list {
+/* 排行榜表格卡片 */
+.card-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.55rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1.5px solid #ecd8bf;
+}
+
+.card-title-row h3 {
+  font-size: 1rem;
+  font-weight: 900;
+}
+
+.btn-text-link {
+  background: none;
+  border: none;
+  color: var(--ink-muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.lb-table-view {
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
+  gap: 0.42rem;
 }
 
 .lb-row {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.5rem 0.65rem;
+  padding: 0.48rem 0.65rem;
   background: #fffdf8;
   border: 1.5px solid #e7d5be;
   border-radius: 10px;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   font-weight: 800;
 }
 
@@ -368,7 +460,8 @@ html, body {
   align-items: center;
   justify-content: center;
   font-weight: 900;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
+  flex-shrink: 0;
 }
 
 .lb-row.rank-1 .lb-rank { background: #f1c40f; color: #fff; }
@@ -383,162 +476,176 @@ html, body {
 }
 
 .lb-meta {
-  font-size: 0.78rem;
+  font-size: 0.74rem;
   color: var(--ink-muted);
 }
 
 .lb-score {
-  font-size: 1rem;
+  font-size: 0.98rem;
   font-weight: 900;
   color: var(--red-main);
 }
 
-.text-link {
-  background: none;
-  border: none;
-  color: var(--ink-muted);
-  font-size: 0.8rem;
-  text-decoration: underline;
-  cursor: pointer;
-  display: block;
-  margin: 0.6rem auto 0;
-  font-weight: 800;
+/* =========================================================
+   遊戲主畫面 (Play Canvas)
+========================================================= */
+
+#screen-play {
+  background: #150d08;
+  overflow: hidden;
 }
 
-/* =========================================================
-   遊戲畫面 (全螢幕 Canvas 料理手勢體驗)
-========================================================= */
-#screen-play {
-  background: #190f09;
-  overflow: hidden;
+.play-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   position: relative;
 }
 
 #game-canvas {
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   display: block;
-  touch-action: none; /* 禁用預設捲動與縮放，全由自訂手勢接管 */
+  touch-action: none; /* 禁用瀏覽器預設手勢，全權由遊戲接管 */
 }
 
 /* =========================================================
-   結算畫面 (Screen Result)
+   結算畫面 (Result Screen)
 ========================================================= */
-#screen-result {
-  background: radial-gradient(circle at 50% 15%, #fffdf8 0%, var(--bg-cream) 55%, var(--bg-warm) 100%);
-  padding: 1rem 1rem 2.5rem;
-  max-width: 560px;
-  margin: 0 auto;
-}
 
-.result-poster {
-  width: 100%;
-  max-height: 200px;
-  object-fit: cover;
+.result-poster-card {
+  position: relative;
   border: 3px solid var(--wood-dark);
-  border-radius: 18px;
-  box-shadow: var(--shadow-strong);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
   margin-bottom: 0.85rem;
-  display: block;
-  background: #fff;
+  box-shadow: var(--shadow-lg);
+  background: #000;
 }
 
-.result-card {
-  background: #fff;
-  border: 3px solid var(--wood-dark);
-  border-radius: 20px;
-  padding: 1.1rem;
-  box-shadow: var(--shadow-soft);
+.result-poster-img {
+  width: 100%;
+  max-height: 180px;
+  object-fit: cover;
+  display: block;
+}
+
+.result-star-row {
+  position: absolute;
+  bottom: 8px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 2.2rem;
+  letter-spacing: 5px;
+  color: var(--gold-main);
+  text-shadow: 0 3px 8px rgba(0, 0, 0, 0.7);
+}
+
+.result-main-card {
   text-align: center;
 }
 
-.result-stars {
-  font-size: 2rem;
-  letter-spacing: 4px;
-  color: #f1c40f;
-  margin-bottom: 0.25rem;
-}
-
-#result-title {
-  font-size: 1.55rem;
+#result-main-title {
+  font-size: 1.6rem;
   font-weight: 900;
   color: var(--red-main);
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.35rem;
 }
 
-.result-sub {
-  font-size: 0.95rem;
+.result-desc {
+  font-size: 0.92rem;
   font-weight: 800;
   color: var(--ink-muted);
-  margin-bottom: 1rem;
   line-height: 1.4;
+  margin-bottom: 1rem;
 }
 
-.batch-list {
+.batch-breakdown-container {
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
-  margin-bottom: 1.2rem;
+  gap: 0.65rem;
+  margin-bottom: 1.1rem;
   text-align: left;
 }
 
 .batch-card {
   background: #fffdf8;
   border: 2px solid var(--wood-gold);
-  border-radius: 14px;
-  padding: 0.75rem 0.9rem;
+  border-radius: var(--radius-md);
+  padding: 0.75rem 0.85rem;
 }
 
 .batch-card-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-weight: 900;
   font-size: 1.05rem;
+  font-weight: 900;
   margin-bottom: 0.4rem;
 }
 
 .batch-card-price {
   color: var(--red-main);
   font-size: 1.25rem;
+  font-weight: 900;
 }
 
 .batch-card-attrs {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 0.4rem;
-  font-size: 0.82rem;
+  gap: 0.35rem;
+  font-size: 0.8rem;
   font-weight: 800;
-  background: #fff5e6;
+  background: #fff6e8;
   border-radius: 8px;
-  padding: 0.4rem 0.6rem;
-  margin-bottom: 0.4rem;
+  padding: 0.45rem 0.55rem;
+  margin-bottom: 0.45rem;
   text-align: center;
 }
 
+.batch-card-attrs b {
+  color: var(--red-main);
+}
+
 .batch-card-steps {
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   color: var(--ink-muted);
   display: flex;
   flex-wrap: wrap;
   gap: 0.3rem 0.5rem;
 }
 
-.result-btns {
+.result-btn-stack {
   display: flex;
   flex-direction: column;
-  gap: 0.55rem;
-  margin-bottom: 1.4rem;
+  gap: 0.6rem;
+  margin-bottom: 1.2rem;
+}
+
+.result-lb-section {
+  text-align: left;
+  border-top: 2px dashed #ecd8bf;
+  padding-top: 0.9rem;
+}
+
+.result-lb-section h3 {
+  font-size: 1.05rem;
+  font-weight: 900;
+  margin-bottom: 0.5rem;
 }
 
 /* =========================================================
    彈窗 (Modals)
 ========================================================= */
-.modal {
+
+.modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(20, 10, 5, 0.72);
-  backdrop-filter: blur(4px);
+  background: rgba(18, 10, 5, 0.75);
+  backdrop-filter: blur(5px);
   z-index: 100;
   display: flex;
   align-items: center;
@@ -546,24 +653,24 @@ html, body {
   padding: 1rem;
 }
 
-.modal.hidden {
+.modal-backdrop.hidden {
   display: none;
 }
 
-.modal-card {
+.modal-window {
   background: #fff;
   border: 3.5px solid var(--wood-dark);
   border-radius: 20px;
-  max-width: 500px;
+  max-width: 480px;
   width: 100%;
   max-height: 85vh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  box-shadow: var(--shadow-strong);
+  box-shadow: var(--shadow-lg);
 }
 
-.modal-head {
+.modal-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -572,19 +679,19 @@ html, body {
   border-bottom: 2px solid var(--wood-gold);
 }
 
-.modal-head h3 {
-  font-size: 1.2rem;
+.modal-header h3 {
+  font-size: 1.15rem;
   font-weight: 900;
   color: var(--ink-dark);
 }
 
-.close-btn {
+.modal-close-btn {
   width: 36px;
   height: 36px;
   border-radius: 50%;
   border: 2px solid var(--wood-dark);
   background: #fff;
-  font-size: 1rem;
+  font-size: 1.05rem;
   font-weight: 900;
   cursor: pointer;
   display: flex;
@@ -592,62 +699,42 @@ html, body {
   justify-content: center;
 }
 
-.modal-body {
-  padding: 1rem;
+.modal-content {
+  padding: 1rem 1.1rem;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  font-size: 0.92rem;
+  font-size: 0.9rem;
   line-height: 1.5;
 }
 
-.howto-lead {
+.rules-summary {
   font-weight: 800;
   color: var(--ink-dark);
-  margin-bottom: 0.8rem;
-}
-
-.g-p { color: #27ae60; }
-.g-g { color: #f39c12; }
-.g-f { color: #e74c3c; }
-
-.howto-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 1rem;
-  font-size: 0.82rem;
-}
-
-.howto-table th, .howto-table td {
-  border: 1.5px solid #d8c2a7;
-  padding: 0.45rem 0.5rem;
-  text-align: left;
-}
-
-.howto-table th {
-  background: #f5e4ce;
-  font-weight: 900;
-}
-
-.howto-table td:first-child {
-  font-weight: 900;
-  white-space: nowrap;
-}
-
-.howto-levels {
-  padding-left: 1.2rem;
-  margin-bottom: 0.8rem;
-  font-size: 0.86rem;
-}
-
-.howto-levels li {
-  margin-bottom: 0.35rem;
-}
-
-.howto-tip {
-  background: #fff8d6;
-  border: 1.5px solid #e6b800;
+  margin-bottom: 0.9rem;
+  background: #fff7eb;
+  padding: 0.65rem 0.8rem;
   border-radius: 10px;
-  padding: 0.5rem 0.75rem;
-  font-weight: 800;
-  color: #7c5800;
+  border: 1.5px solid var(--wood-gold);
+}
+
+.badge-tag-p { color: var(--green-main); font-weight: 900; }
+.badge-tag-g { color: #d48806; font-weight: 900; }
+.badge-tag-f { color: var(--red-bright); font-weight: 900; }
+
+.rule-step-item {
+  border-bottom: 1px dashed #e8d7c3;
+  padding-bottom: 0.65rem;
+  margin-bottom: 0.65rem;
+}
+
+.rule-step-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.rule-step-title {
+  font-size: 0.95rem;
+  font-weight: 900;
+  color: var(--red-main);
+  margin-bottom: 0.2rem;
 }

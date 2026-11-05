@@ -3,124 +3,181 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <meta name="theme-color" content="#3b2416" />
+  <meta name="theme-color" content="#231710" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>包記炊粿：手感炊粿大挑戰</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <!-- ==========================================
-       主畫面：暱稱、關卡選擇、排行榜
-       ========================================== -->
+  <!-- =========================================================
+       畫面 1：遊戲主畫面 (首頁 / 關卡選擇 / 排行榜)
+       ========================================================= -->
   <section id="screen-title" class="screen active">
-    <header class="hub-header">
-      <img src="正面.jfif" alt="包記炊粿" class="brand-icon" />
-      <div class="brand-text">
-        <h1>包記炊粿</h1>
-        <p>手感炊粿大挑戰</p>
+    <div class="screen-scroll-wrap">
+      <!-- 頂部品牌 -->
+      <header class="app-topbar">
+        <div class="app-brand">
+          <img src="正面.jfif" alt="包記炊粿" class="app-logo" />
+          <div>
+            <h1 class="app-title">包記炊粿</h1>
+            <p class="app-subtitle">手感炊粿大挑戰・料理媽媽風味</p>
+          </div>
+        </div>
+        <button id="btn-sound-toggle" class="icon-circle-btn" type="button" aria-label="音效開關">🔊</button>
+      </header>
+
+      <!-- 首頁橫幅 -->
+      <div class="hero-banner">
+        <img src="assets/iso_kitchen_room.jpg" alt="古早味廚房" class="hero-banner-img" />
+        <div class="hero-banner-glass">
+          <span class="hero-pill">🥢 傳統古法 7 道手感關卡</span>
+          <p class="hero-text">看準時機・掌控火候！手勢點滑長按，狂按沒有用！</p>
+        </div>
       </div>
-      <button id="btn-sound" class="icon-btn" type="button" aria-label="音效開關">🔊</button>
-    </header>
 
-    <div class="hero-card">
-      <img src="assets/ui_map.jpg" alt="老街地圖" />
-      <div class="hero-caption">
-        一籠菜頭粿，拆成 <b>7 道手感關卡</b>！<br />
-        看時機、靠手感，狂按沒有用。
+      <!-- 玩家暱稱輸入 -->
+      <div class="card player-name-card">
+        <label for="player-name-input" class="field-label">👤 炊粿職人大名</label>
+        <div class="input-wrap">
+          <input id="player-name-input" type="text" maxlength="8" value="炊粿快手" placeholder="輸入暱稱" />
+          <span class="input-hint">登錄排行榜專用</span>
+        </div>
       </div>
-    </div>
 
-    <label class="name-row">
-      👤 職人暱稱
-      <input id="player-name-input" type="text" maxlength="10" value="炊粿快手" />
-    </label>
+      <!-- 關卡選擇 -->
+      <div class="section-head">
+        <h2>🗺️ 選擇營業場地</h2>
+        <span class="section-sub">越後面的關卡節奏越快</span>
+      </div>
 
-    <h2 class="section-title">🗺️ 選擇關卡</h2>
-    <div class="level-list" id="level-list"></div>
+      <div class="level-cards-grid" id="level-selector-list"></div>
 
-    <button id="btn-start" class="primary-btn big" type="button">🔥 開店炊粿！</button>
+      <!-- 主開始按鈕 -->
+      <button id="btn-start-game" class="btn-giant-primary" type="button">
+        🔥 捲起袖子・開店炊粿！
+      </button>
 
-    <div class="hub-actions">
-      <button id="btn-howto" class="secondary-btn" type="button">📜 怎麼玩</button>
-      <button id="btn-lb" class="secondary-btn" type="button">🏆 完整排行榜</button>
-    </div>
+      <!-- 輔助功能按鈕 -->
+      <div class="hub-aux-grid">
+        <button id="btn-open-rules" class="btn-aux" type="button">📜 怎麼玩 (7道工序)</button>
+        <button id="btn-open-lb" class="btn-aux" type="button">🏆 風雲排行榜</button>
+      </div>
 
-    <div class="panel">
-      <h3>🏆 風雲排行榜</h3>
-      <div id="hub-lb" class="lb-list"></div>
-      <button id="btn-reset-lb" class="text-link" type="button">重置排行紀錄</button>
+      <!-- 首頁簡易排行榜卡片 -->
+      <div class="card hub-lb-card">
+        <div class="card-title-row">
+          <h3>🏆 風雲排行榜（前五強）</h3>
+          <button id="btn-reset-lb" class="btn-text-link" type="button">重置</button>
+        </div>
+        <div id="hub-lb-container" class="lb-table-view"></div>
+      </div>
     </div>
   </section>
 
-  <!-- ==========================================
-       遊戲畫面：全螢幕手勢畫布
-       ========================================== -->
+  <!-- =========================================================
+       畫面 2：全螢幕 2.5D 手勢炊粿遊戲畫布
+       ========================================================= -->
   <section id="screen-play" class="screen">
-    <canvas id="game-canvas"></canvas>
-  </section>
-
-  <!-- ==========================================
-       結算畫面
-       ========================================== -->
-  <section id="screen-result" class="screen">
-    <img id="result-poster" class="result-poster" src="assets/ui_win.jpg" alt="結算" />
-    <div class="result-card">
-      <div id="result-stars" class="result-stars">★★★</div>
-      <h2 id="result-title">通關成功！大豐收！</h2>
-      <p id="result-sub" class="result-sub"></p>
-      <div id="result-batches" class="batch-list"></div>
-      <div class="result-btns">
-        <button id="btn-next" class="primary-btn gold" type="button">➡️ 挑戰下一關</button>
-        <button id="btn-retry" class="primary-btn" type="button">🔄 再挑戰一次</button>
-        <button id="btn-home" class="secondary-btn" type="button">🏠 回主畫面</button>
-      </div>
-      <h3>🏆 風雲排行榜</h3>
-      <div id="result-lb" class="lb-list"></div>
+    <div class="play-container">
+      <canvas id="game-canvas"></canvas>
     </div>
   </section>
 
-  <!-- 怎麼玩 -->
-  <div id="howto-modal" class="modal hidden" role="dialog" aria-modal="true">
-    <div class="modal-card">
-      <div class="modal-head">
-        <h3>📜 怎麼玩</h3>
-        <button class="close-btn" data-close="howto-modal" type="button">✕</button>
+  <!-- =========================================================
+       畫面 3：結算畫面 (營業額、品質評級、星星、排行榜)
+       ========================================================= -->
+  <section id="screen-result" class="screen">
+    <div class="screen-scroll-wrap">
+      <div class="result-poster-card">
+        <img id="result-poster-img" src="assets/ui_win.jpg" alt="結算海報" class="result-poster-img" />
+        <div id="result-star-row" class="result-star-row">★★★</div>
       </div>
-      <div class="modal-body">
-        <p class="howto-lead">一籠粿拆成 7 個步驟，每一步都有限時，評分分成 <b class="g-p">完美</b>、<b class="g-g">不錯</b>、<b class="g-f">失敗</b>。七步的評價合起來決定這籠粿的 <b>Q 度、香氣、賣相</b>，品質越好賣越貴！</p>
-        <table class="howto-table">
-          <thead><tr><th>步驟</th><th>手勢</th><th>做不好會怎樣</th></tr></thead>
-          <tbody>
-            <tr><td>① 刨絲</td><td>按住蘿蔔上下滑，跟著節奏光點</td><td>太快會刨到手，扣分還停頓</td></tr>
-            <tr><td>② 調漿</td><td>按住倒水、放開停在 3:1 線；再畫圈攪拌</td><td>水太多太稀，粉粒沒散口感差</td></tr>
-            <tr><td>③ 鐵鑊翻炒</td><td>點掉鍋底焦點；糊化條進「濃稠區」按起鍋</td><td>太早太稀、太晚太硬，焦點沒鏟會起火</td></tr>
-            <tr><td>④ 添柴</td><td>從柴堆抓木柴，甩進灶門</td><td>火力離開綠區就扣分</td></tr>
-            <tr><td>⑤ 蒸粿</td><td>甩柴顧火＋按住水瓢補水</td><td>乾燒就整籠報廢</td></tr>
-            <tr><td>⑥ 竹籤驗收</td><td>指針進綠區時點一下</td><td>太早半生，太晚蒸過頭</td></tr>
-            <tr><td>⑦ 切塊出貨</td><td>由上往下劃 3 刀；再把盤子甩上發財車</td><td>切歪賣相差，甩歪掉地上</td></tr>
-          </tbody>
-        </table>
-        <h4>🗺️ 三個關卡</h4>
-        <ul class="howto-levels">
-          <li><b>老街早市</b>：一次一籠，節奏慢，等於教學。</li>
-          <li><b>廟口夜市</b>：步驟限時變短，老鼠會衝過、客人會催單，要分心點掉。</li>
-          <li><b>年貨大街</b>：兩個蒸籠同時炊，炒這籠時另一籠在蒸，點上方蒸籠切來切去顧。</li>
-        </ul>
-        <p class="howto-tip">💡 每多做一籠，速度就再快一點！</p>
+
+      <div class="card result-main-card">
+        <h2 id="result-main-title">通關成功！大豐收！</h2>
+        <p id="result-main-sub" class="result-desc"></p>
+
+        <!-- 每一籠的 Q度/香氣/賣相/售價 -->
+        <div class="batch-breakdown-container" id="result-batches-list"></div>
+
+        <div class="result-btn-stack">
+          <button id="btn-result-next" class="btn-giant-primary gold" type="button">➡️ 挑戰下一關</button>
+          <button id="btn-result-retry" class="btn-giant-primary" type="button">🔄 重新挑戰本關</button>
+          <button id="btn-result-home" class="btn-aux big" type="button">🏠 回主畫面選關</button>
+        </div>
+
+        <div class="result-lb-section">
+          <h3>🏆 最新排行榜戰況</h3>
+          <div id="result-lb-container" class="lb-table-view"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       彈窗：7道工序與規則說明
+       ========================================================= -->
+  <div id="modal-rules" class="modal-backdrop hidden" role="dialog" aria-modal="true">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h3>📜 菜頭粿 7 道古法手感指南</h3>
+        <button class="modal-close-btn" data-close="modal-rules" type="button">✕</button>
+      </div>
+      <div class="modal-content">
+        <p class="rules-summary">
+          一籠菜頭粿拆解為 <b>7 道手感關卡</b>。每步驟限時完成，評分分成 <span class="badge-tag-p">完美 👑</span>、<span class="badge-tag-g">不錯 👍</span>、<span class="badge-tag-f">失敗 💥</span>，綜合決定這籠粿的 <b>彈牙Q度、柴火香氣、刀工賣相</b>，品質越高賣價越高！
+        </p>
+
+        <div class="rule-step-item">
+          <div class="rule-step-title">① 刨絲 (上下來回滑)</div>
+          <p>按住蘿蔔在刨板上上下滑動削絲。注意速度計需維持在<b>綠區</b>，太快太急會削到手扣分且停頓！</p>
+        </div>
+
+        <div class="rule-step-item">
+          <div class="rule-step-title">② 調漿 (長按注水 + 畫圈攪拌)</div>
+          <p>按住水壺倒水，放開停在 <b>3:1 黃金刻度線</b>；接著手指在盆中畫圈攪拌打散粉粒，直到均勻無結塊！</p>
+        </div>
+
+        <div class="rule-step-item">
+          <div class="rule-step-title">③ 鐵鑊翻炒 (點擊鏟焦點 + 適時起鍋)</div>
+          <p>鍋底會不斷冒出高溫焦點，快點擊焦點鏟除防起火！糊化條進「濃稠黃金區」時，按下起鍋鍵！</p>
+        </div>
+
+        <div class="rule-step-item">
+          <div class="rule-step-title">④ 添柴 (拖甩木柴進灶門)</div>
+          <p>灶火會自然衰退波動，將底部的乾燥柴薪拖曳甩入紅磚大灶門，維持火力溫度在綠區！</p>
+        </div>
+
+        <div class="rule-step-item">
+          <div class="rule-step-title">⑤ 蒸粿 (快蒸 + 長按水瓢補水)</div>
+          <p>大火蒸熟米糰，外鍋水位會持續沸騰消耗。外鍋快沒水時按住水瓢補水，<b>一旦乾燒整籠報廢！</b></p>
+        </div>
+
+        <div class="rule-step-item">
+          <div class="rule-step-title">⑥ 竹籤驗收 (指針進綠區時點擊)</div>
+          <p>蒸籠開啟，指針左右擺動。在指針進入<b>中央綠色熟透區</b>時點擊插籤，拔出不沾黏才是完美起籠！</p>
+        </div>
+
+        <div class="rule-step-item">
+          <div class="rule-step-title">⑦ 切塊出貨 (劃3刀 + 甩上發財車)</div>
+          <p>垂直劃 3 刀均勻切塊，淋上蒜蓉甜辣醬；接著把盛盤菜頭粿<b>向上滑動甩上發財車後斗</b>出貨！</p>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- 完整排行榜 -->
-  <div id="lb-modal" class="modal hidden" role="dialog" aria-modal="true">
-    <div class="modal-card">
-      <div class="modal-head">
-        <h3>🏆 包記炊粿風雲排行榜</h3>
-        <button class="close-btn" data-close="lb-modal" type="button">✕</button>
+  <!-- =========================================================
+       彈窗：完整排行榜
+       ========================================================= -->
+  <div id="modal-lb" class="modal-backdrop hidden" role="dialog" aria-modal="true">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h3>🏆 包記炊粿・全台職人榜</h3>
+        <button class="modal-close-btn" data-close="modal-lb" type="button">✕</button>
       </div>
-      <div class="modal-body">
-        <div id="modal-lb" class="lb-list"></div>
+      <div class="modal-content">
+        <div id="modal-lb-container" class="lb-table-view"></div>
       </div>
     </div>
   </div>
