@@ -1,28 +1,27 @@
 /* =========================================================
-   包記炊粿：手感炊粿大挑戰 CSS 樣式
-   設計語言：台式古早味街頭紅磚、溫潤木紋、現代精緻扁平卡片、手遊高對比視覺
+   包記炊粿：顧粿沒那麼簡單 CSS 樣式
+   設計語言：台式手繪漫畫粗黑線條、溫潤紅磚木紋、手遊高對比貼紙立體感
 ========================================================= */
 
 :root {
-  --bg-dark: #1f140e;
-  --bg-cream: #fbf5ea;
-  --bg-warm: #f4dfc7;
+  --bg-dark: #1b100a;
+  --bg-cream: #fbf4e6;
+  --bg-warm: #f3dcc1;
   --red-main: #c82829;
-  --red-dark: #8c1718;
+  --red-dark: #7d1112;
   --red-bright: #e74c3c;
   --wood-gold: #c88a4b;
-  --wood-dark: #4a2815;
-  --ink-dark: #231710;
-  --ink-muted: #6e5544;
+  --wood-dark: #3e200e;
+  --ink-dark: #21130b;
+  --ink-muted: #694e3c;
   --green-main: #27ae60;
   --gold-main: #f1c40f;
-  --gold-dark: #b8650a;
-  --card-bg: #ffffff;
+  --gold-dark: #b05f06;
+  --card-bg: #fffdf9;
   --radius-lg: 18px;
-  --radius-md: 12px;
-  --shadow-sm: 0 4px 12px rgba(35, 23, 16, 0.08);
-  --shadow-md: 0 8px 24px rgba(35, 23, 16, 0.16);
-  --shadow-lg: 0 16px 36px rgba(18, 10, 5, 0.35);
+  --radius-md: 13px;
+  --shadow-sm: 0 4px 0 rgba(62, 32, 14, 0.18), 0 6px 14px rgba(33, 19, 11, 0.1);
+  --shadow-lg: 0 8px 0 rgba(33, 19, 11, 0.35), 0 16px 36px rgba(18, 10, 5, 0.4);
 }
 
 * {
@@ -60,74 +59,71 @@ html, body {
   flex-direction: column;
 }
 
-/* 捲動容器 (供首頁與結算頁面使用) */
+/* 捲動容器 */
 .screen-scroll-wrap {
   width: 100%;
   height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
-  background: radial-gradient(circle at 50% 10%, #fffdf8 0%, var(--bg-cream) 60%, var(--bg-warm) 100%);
-  padding: 0.9rem 1rem 3rem;
-  max-width: 540px;
+  background:
+    radial-gradient(circle at 50% 0%, #fffef9 0%, var(--bg-cream) 55%, var(--bg-warm) 100%);
+  padding: 0.75rem 0.95rem 2.8rem;
+  max-width: 520px;
   margin: 0 auto;
 }
 
 /* =========================================================
-   首頁 (Title Hub)
+   首頁頂部導覽列
 ========================================================= */
-
 .app-topbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.4rem 0 0.8rem;
+  padding: 0.25rem 0 0.65rem;
 }
 
 .app-brand {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.6rem;
 }
 
-.app-logo {
-  width: 48px;
-  height: 48px;
-  border-radius: 14px;
-  border: 2.5px solid var(--red-main);
-  object-fit: cover;
-  background: #fff;
-  box-shadow: 0 4px 10px rgba(200, 40, 41, 0.25);
+.app-logo-sticker {
+  width: 54px;
+  height: 46px;
+  object-fit: contain;
+  filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.28));
 }
 
 .app-title {
-  font-size: 1.45rem;
+  font-size: 1.5rem;
   font-weight: 900;
   color: var(--red-main);
   letter-spacing: 1px;
-  line-height: 1.15;
+  line-height: 1.1;
+  text-shadow: 1px 1px 0 #fff, 0 2px 0 rgba(125, 17, 18, 0.25);
 }
 
 .app-subtitle {
-  font-size: 0.8rem;
-  font-weight: 800;
+  font-size: 0.78rem;
+  font-weight: 900;
   color: var(--wood-dark);
 }
 
 .icon-circle-btn {
-  width: 44px;
-  height: 44px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
-  border: 2px solid var(--wood-dark);
+  border: 2.5px solid var(--wood-dark);
   background: #fff;
-  font-size: 1.25rem;
+  font-size: 1.2rem;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   box-shadow: 0 3px 0 var(--wood-dark);
   touch-action: manipulation;
-  transition: transform 0.08s ease;
 }
 
 .icon-circle-btn:active {
@@ -135,53 +131,121 @@ html, body {
   box-shadow: 0 1px 0 var(--wood-dark);
 }
 
-/* 首頁橫幅 */
-.hero-banner {
+/* =========================================================
+   主視覺雙海報舞台 (展示 背面.jfif & 正面.jfif 透明去背立繪)
+========================================================= */
+.hero-stage-card {
   position: relative;
-  border: 2.5px solid var(--wood-dark);
+  border: 3px solid var(--wood-dark);
   border-radius: var(--radius-lg);
   overflow: hidden;
-  margin-bottom: 0.9rem;
+  margin-bottom: 0.75rem;
   box-shadow: var(--shadow-sm);
-  background: #000;
+  background: #2b180e;
 }
 
-.hero-banner-img {
-  width: 100%;
-  height: 145px;
-  object-fit: cover;
-  display: block;
-  opacity: 0.95;
-}
-
-.hero-banner-glass {
+.hero-stage-bg {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(35, 23, 16, 0.15) 0%, rgba(35, 23, 16, 0.85) 100%);
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  padding: 0.85rem;
+  background:
+    linear-gradient(180deg, rgba(35, 18, 9, 0.25) 0%, rgba(28, 14, 7, 0.88) 100%),
+    url("assets/ui_kitchen_scene.jpg") center/cover no-repeat;
+  opacity: 0.85;
 }
 
-.hero-pill {
-  align-self: flex-start;
+.hero-art-showcase {
+  position: relative;
+  z-index: 2;
+  height: 235px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.4rem 0.6rem 0;
+}
+
+.hero-boss-art {
+  height: 225px;
+  max-width: 78%;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.65));
+  transform: translateX(-14px);
+}
+
+.hero-gua-badge {
+  position: absolute;
+  right: 10px;
+  bottom: 6px;
+  width: 118px;
+  height: 100px;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.6));
+  animation: floatBadge 2.6s ease-in-out infinite;
+}
+
+@keyframes floatBadge {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-5px) rotate(2deg); }
+}
+
+.hero-stage-caption {
+  position: relative;
+  z-index: 3;
+  background: rgba(24, 13, 7, 0.92);
+  border-top: 2px solid rgba(200, 138, 75, 0.5);
+  padding: 0.55rem 0.8rem 0.65rem;
+}
+
+.hero-tag-pill {
+  display: inline-block;
   background: var(--red-main);
   color: #fff;
-  font-size: 0.76rem;
+  font-size: 0.72rem;
   font-weight: 900;
-  padding: 0.18rem 0.55rem;
+  padding: 0.14rem 0.55rem;
   border-radius: 999px;
-  margin-bottom: 0.35rem;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  margin-bottom: 0.28rem;
+  border: 1.5px solid #ffdf6b;
 }
 
-.hero-text {
-  color: #fff;
-  font-size: 0.88rem;
+.hero-caption-text {
+  color: #fdf6e9;
+  font-size: 0.8rem;
   font-weight: 800;
   line-height: 1.35;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+/* 7 道工序手繪貼圖預覽列 */
+.sprite-strip-card {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.25rem;
+  background: #fff9ee;
+  border: 2.5px solid var(--wood-dark);
+  border-radius: var(--radius-md);
+  padding: 0.45rem 0.35rem;
+  margin-bottom: 0.75rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.sprite-strip-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.sprite-strip-item img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.22));
+}
+
+.sprite-strip-item span {
+  font-size: 0.66rem;
+  font-weight: 900;
+  color: var(--wood-dark);
+  white-space: nowrap;
 }
 
 /* 卡片容器 */
@@ -189,9 +253,9 @@ html, body {
   background: var(--card-bg);
   border: 2.5px solid var(--wood-dark);
   border-radius: var(--radius-md);
-  padding: 0.85rem 0.95rem;
+  padding: 0.75rem 0.9rem;
   box-shadow: var(--shadow-sm);
-  margin-bottom: 0.9rem;
+  margin-bottom: 0.75rem;
 }
 
 .player-name-card {
@@ -202,7 +266,7 @@ html, body {
 
 .field-label {
   font-weight: 900;
-  font-size: 0.95rem;
+  font-size: 0.92rem;
   color: var(--ink-dark);
 }
 
@@ -212,9 +276,9 @@ html, body {
 
 #player-name-input {
   border: none;
-  border-bottom: 2px dashed var(--red-main);
+  border-bottom: 2.5px dashed var(--red-main);
   background: transparent;
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   font-weight: 900;
   color: var(--red-main);
   text-align: right;
@@ -226,8 +290,8 @@ html, body {
 
 .input-hint {
   display: block;
-  font-size: 0.68rem;
-  font-weight: 700;
+  font-size: 0.66rem;
+  font-weight: 800;
   color: var(--ink-muted);
 }
 
@@ -235,17 +299,17 @@ html, body {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  margin: 0.2rem 0 0.5rem;
+  margin: 0.15rem 0 0.45rem;
 }
 
 .section-head h2 {
-  font-size: 1.15rem;
+  font-size: 1.08rem;
   font-weight: 900;
   color: var(--ink-dark);
 }
 
 .section-sub {
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   font-weight: 800;
   color: var(--ink-muted);
 }
@@ -254,18 +318,18 @@ html, body {
 .level-cards-grid {
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
-  margin-bottom: 1rem;
+  gap: 0.55rem;
+  margin-bottom: 0.85rem;
 }
 
 .level-card {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.7rem;
   background: #fff;
-  border: 2.5px solid #dcd1be;
+  border: 2.5px solid #d7c7b2;
   border-radius: var(--radius-md);
-  padding: 0.75rem 0.85rem;
+  padding: 0.65rem 0.8rem;
   cursor: pointer;
   transition: all 0.12s ease;
   touch-action: manipulation;
@@ -273,35 +337,29 @@ html, body {
 
 .level-card.selected {
   border-color: var(--red-main);
-  background: #fff9ee;
-  box-shadow: 0 0 0 3px rgba(200, 40, 41, 0.22), 0 6px 14px rgba(200, 40, 41, 0.14);
+  background: #fff7e8;
+  box-shadow: 0 0 0 3px rgba(200, 40, 41, 0.2), 0 4px 0 var(--red-dark);
   transform: translateY(-1px);
 }
 
 .level-badge-box {
-  width: 50px;
-  height: 50px;
+  width: 48px;
+  height: 48px;
   border-radius: 12px;
-  background: linear-gradient(135deg, #ffd32a 0%, #f39c12 100%);
-  border: 2px solid var(--wood-dark);
+  background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+  border: 2.5px solid var(--wood-dark);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  font-weight: 900;
-  color: var(--ink-dark);
   box-shadow: 0 3px 0 var(--wood-dark);
 }
 
-.level-badge-id {
-  font-size: 0.7rem;
-  line-height: 1;
-}
-
-.level-badge-icon {
-  font-size: 1.15rem;
-  line-height: 1.1;
+.level-badge-img {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
 }
 
 .level-content {
@@ -316,41 +374,43 @@ html, body {
 }
 
 .level-title {
-  font-size: 1.05rem;
+  font-size: 1.02rem;
   font-weight: 900;
   color: var(--ink-dark);
 }
 
 .level-tag {
-  font-size: 0.78rem;
-  font-weight: 800;
+  font-size: 0.75rem;
+  font-weight: 900;
   color: var(--red-main);
+  background: #ffe8e6;
+  padding: 0.1rem 0.45rem;
+  border-radius: 99px;
 }
 
 .level-sub-desc {
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   font-weight: 700;
   color: var(--ink-muted);
-  margin-top: 2px;
-  line-height: 1.35;
+  margin-top: 3px;
+  line-height: 1.32;
 }
 
-/* 巨型大按鈕 */
+/* 巨型主按鈕 */
 .btn-giant-primary {
   width: 100%;
-  background: linear-gradient(180deg, #e74c3c 0%, var(--red-main) 100%);
+  background: linear-gradient(180deg, #eb4d3d 0%, var(--red-main) 100%);
   color: #fff;
   border: 3px solid var(--red-dark);
   border-radius: var(--radius-md);
   font-weight: 900;
-  font-size: 1.25rem;
-  padding: 0.95rem 1rem;
+  font-size: 1.2rem;
+  padding: 0.85rem 1rem;
   cursor: pointer;
-  box-shadow: 0 5px 0 var(--red-dark), 0 10px 20px rgba(200, 40, 41, 0.35);
+  box-shadow: 0 5px 0 var(--red-dark), 0 8px 18px rgba(200, 40, 41, 0.35);
   text-align: center;
   touch-action: manipulation;
-  transition: transform 0.08s ease, box-shadow 0.08s ease;
-  margin-bottom: 0.9rem;
+  margin-bottom: 0.75rem;
 }
 
 .btn-giant-primary:active {
@@ -362,19 +422,15 @@ html, body {
   background: linear-gradient(180deg, #ffd32a 0%, #f39c12 100%);
   color: var(--ink-dark);
   border-color: var(--gold-dark);
-  box-shadow: 0 5px 0 var(--gold-dark), 0 10px 20px rgba(243, 156, 18, 0.35);
-}
-
-.btn-giant-primary.gold:active {
-  box-shadow: 0 2px 0 var(--gold-dark);
+  box-shadow: 0 5px 0 var(--gold-dark), 0 8px 18px rgba(243, 156, 18, 0.35);
 }
 
 /* 輔助按鈕雙欄 */
 .hub-aux-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.65rem;
-  margin-bottom: 1rem;
+  gap: 0.6rem;
+  margin-bottom: 0.85rem;
 }
 
 .btn-aux {
@@ -382,8 +438,8 @@ html, body {
   border: 2.5px solid var(--wood-dark);
   color: var(--ink-dark);
   font-weight: 900;
-  font-size: 0.92rem;
-  padding: 0.65rem;
+  font-size: 0.9rem;
+  padding: 0.6rem;
   border-radius: var(--radius-md);
   cursor: pointer;
   box-shadow: 0 3px 0 var(--wood-dark);
@@ -398,22 +454,22 @@ html, body {
 
 .btn-aux.big {
   width: 100%;
-  padding: 0.85rem;
-  font-size: 1.05rem;
+  padding: 0.8rem;
+  font-size: 1rem;
 }
 
-/* 排行榜表格卡片 */
+/* 排行榜表格 */
 .card-title-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 0.55rem;
+  margin-bottom: 0.5rem;
   padding-bottom: 0.35rem;
-  border-bottom: 1.5px solid #ecd8bf;
+  border-bottom: 1.5px solid #ead5bc;
 }
 
 .card-title-row h3 {
-  font-size: 1rem;
+  font-size: 0.98rem;
   font-weight: 900;
 }
 
@@ -421,7 +477,7 @@ html, body {
   background: none;
   border: none;
   color: var(--ink-muted);
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   font-weight: 800;
   text-decoration: underline;
   cursor: pointer;
@@ -430,42 +486,42 @@ html, body {
 .lb-table-view {
   display: flex;
   flex-direction: column;
-  gap: 0.42rem;
+  gap: 0.38rem;
 }
 
 .lb-row {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.48rem 0.65rem;
+  padding: 0.45rem 0.6rem;
   background: #fffdf8;
-  border: 1.5px solid #e7d5be;
+  border: 1.5px solid #e6d3bb;
   border-radius: 10px;
-  font-size: 0.88rem;
+  font-size: 0.86rem;
   font-weight: 800;
 }
 
 .lb-row.is-player {
-  background: #fff4d3;
+  background: #fff3cd;
   border-color: var(--red-main);
   box-shadow: 0 0 0 2px rgba(200, 40, 41, 0.2);
 }
 
 .lb-rank {
-  width: 26px;
-  height: 26px;
+  width: 25px;
+  height: 25px;
   border-radius: 50%;
   background: #e2ceaf;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 900;
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   flex-shrink: 0;
 }
 
 .lb-row.rank-1 .lb-rank { background: #f1c40f; color: #fff; }
-.lb-row.rank-2 .lb-rank { background: #bdc3c7; color: #fff; }
+.lb-row.rank-2 .lb-rank { background: #95a5a6; color: #fff; }
 .lb-row.rank-3 .lb-rank { background: #e67e22; color: #fff; }
 
 .lb-name {
@@ -476,12 +532,12 @@ html, body {
 }
 
 .lb-meta {
-  font-size: 0.74rem;
+  font-size: 0.72rem;
   color: var(--ink-muted);
 }
 
 .lb-score {
-  font-size: 0.98rem;
+  font-size: 0.95rem;
   font-weight: 900;
   color: var(--red-main);
 }
@@ -489,9 +545,8 @@ html, body {
 /* =========================================================
    遊戲主畫面 (Play Canvas)
 ========================================================= */
-
 #screen-play {
-  background: #150d08;
+  background: #140b06;
   overflow: hidden;
 }
 
@@ -508,40 +563,66 @@ html, body {
   width: 100%;
   height: 100%;
   display: block;
-  touch-action: none; /* 禁用瀏覽器預設手勢，全權由遊戲接管 */
+  touch-action: none;
 }
 
 /* =========================================================
    結算畫面 (Result Screen)
 ========================================================= */
-
-.result-poster-card {
+.result-hero-card {
   position: relative;
   border: 3px solid var(--wood-dark);
   border-radius: var(--radius-lg);
   overflow: hidden;
-  margin-bottom: 0.85rem;
+  margin-bottom: 0.8rem;
   box-shadow: var(--shadow-lg);
-  background: #000;
+  background: #1e110a;
+  height: 215px;
 }
 
-.result-poster-img {
+.result-poster-bg {
   width: 100%;
-  max-height: 180px;
+  height: 100%;
   object-fit: cover;
+  opacity: 0.55;
   display: block;
+}
+
+.result-hero-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 22px;
+}
+
+.result-boss-sticker {
+  height: 185px;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.7));
+}
+
+.result-gua-sticker {
+  position: absolute;
+  right: 12px;
+  bottom: 10px;
+  width: 96px;
+  height: 82px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.65));
 }
 
 .result-star-row {
   position: absolute;
-  bottom: 8px;
+  bottom: 4px;
   left: 0;
   right: 0;
   text-align: center;
-  font-size: 2.2rem;
-  letter-spacing: 5px;
+  font-size: 2rem;
+  letter-spacing: 6px;
   color: var(--gold-main);
-  text-shadow: 0 3px 8px rgba(0, 0, 0, 0.7);
+  text-shadow: 0 3px 8px rgba(0, 0, 0, 0.85);
 }
 
 .result-main-card {
@@ -549,25 +630,25 @@ html, body {
 }
 
 #result-main-title {
-  font-size: 1.6rem;
+  font-size: 1.5rem;
   font-weight: 900;
   color: var(--red-main);
-  margin-bottom: 0.35rem;
+  margin-bottom: 0.3rem;
 }
 
 .result-desc {
-  font-size: 0.92rem;
+  font-size: 0.88rem;
   font-weight: 800;
   color: var(--ink-muted);
   line-height: 1.4;
-  margin-bottom: 1rem;
+  margin-bottom: 0.9rem;
 }
 
 .batch-breakdown-container {
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
-  margin-bottom: 1.1rem;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
   text-align: left;
 }
 
@@ -575,21 +656,21 @@ html, body {
   background: #fffdf8;
   border: 2px solid var(--wood-gold);
   border-radius: var(--radius-md);
-  padding: 0.75rem 0.85rem;
+  padding: 0.7rem 0.8rem;
 }
 
 .batch-card-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 1.05rem;
+  font-size: 1rem;
   font-weight: 900;
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.38rem;
 }
 
 .batch-card-price {
   color: var(--red-main);
-  font-size: 1.25rem;
+  font-size: 1.2rem;
   font-weight: 900;
 }
 
@@ -597,12 +678,12 @@ html, body {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 0.35rem;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-weight: 800;
-  background: #fff6e8;
+  background: #fff5e4;
   border-radius: 8px;
-  padding: 0.45rem 0.55rem;
-  margin-bottom: 0.45rem;
+  padding: 0.42rem 0.5rem;
+  margin-bottom: 0.42rem;
   text-align: center;
 }
 
@@ -611,46 +692,45 @@ html, body {
 }
 
 .batch-card-steps {
-  font-size: 0.76rem;
+  font-size: 0.75rem;
   color: var(--ink-muted);
   display: flex;
   flex-wrap: wrap;
-  gap: 0.3rem 0.5rem;
+  gap: 0.28rem 0.48rem;
 }
 
 .result-btn-stack {
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
-  margin-bottom: 1.2rem;
+  gap: 0.55rem;
+  margin-bottom: 1.1rem;
 }
 
 .result-lb-section {
   text-align: left;
-  border-top: 2px dashed #ecd8bf;
-  padding-top: 0.9rem;
+  border-top: 2px dashed #e9d4ba;
+  padding-top: 0.85rem;
 }
 
 .result-lb-section h3 {
-  font-size: 1.05rem;
+  font-size: 1rem;
   font-weight: 900;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.45rem;
 }
 
 /* =========================================================
    彈窗 (Modals)
 ========================================================= */
-
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(18, 10, 5, 0.75);
+  background: rgba(18, 10, 5, 0.78);
   backdrop-filter: blur(5px);
   z-index: 100;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1rem;
+  padding: 0.9rem;
 }
 
 .modal-backdrop.hidden {
@@ -658,7 +738,7 @@ html, body {
 }
 
 .modal-window {
-  background: #fff;
+  background: #fffdf9;
   border: 3.5px solid var(--wood-dark);
   border-radius: 20px;
   max-width: 480px;
@@ -674,24 +754,24 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.85rem 1.1rem;
+  padding: 0.8rem 1rem;
   background: var(--bg-warm);
-  border-bottom: 2px solid var(--wood-gold);
+  border-bottom: 2.5px solid var(--wood-gold);
 }
 
 .modal-header h3 {
-  font-size: 1.15rem;
+  font-size: 1.1rem;
   font-weight: 900;
   color: var(--ink-dark);
 }
 
 .modal-close-btn {
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   border: 2px solid var(--wood-dark);
   background: #fff;
-  font-size: 1.05rem;
+  font-size: 1rem;
   font-weight: 900;
   cursor: pointer;
   display: flex;
@@ -700,19 +780,19 @@ html, body {
 }
 
 .modal-content {
-  padding: 1rem 1.1rem;
+  padding: 0.9rem 1rem;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  font-size: 0.9rem;
-  line-height: 1.5;
+  font-size: 0.86rem;
+  line-height: 1.45;
 }
 
 .rules-summary {
   font-weight: 800;
   color: var(--ink-dark);
-  margin-bottom: 0.9rem;
+  margin-bottom: 0.8rem;
   background: #fff7eb;
-  padding: 0.65rem 0.8rem;
+  padding: 0.6rem 0.75rem;
   border-radius: 10px;
   border: 1.5px solid var(--wood-gold);
 }
@@ -722,9 +802,12 @@ html, body {
 .badge-tag-f { color: var(--red-bright); font-weight: 900; }
 
 .rule-step-item {
-  border-bottom: 1px dashed #e8d7c3;
-  padding-bottom: 0.65rem;
-  margin-bottom: 0.65rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-bottom: 1.5px dashed #e6d4be;
+  padding-bottom: 0.6rem;
+  margin-bottom: 0.6rem;
 }
 
 .rule-step-item:last-child {
@@ -732,9 +815,17 @@ html, body {
   margin-bottom: 0;
 }
 
+.rule-step-icon {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+  flex-shrink: 0;
+  filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.2));
+}
+
 .rule-step-title {
-  font-size: 0.95rem;
+  font-size: 0.92rem;
   font-weight: 900;
   color: var(--red-main);
-  margin-bottom: 0.2rem;
+  margin-bottom: 0.15rem;
 }

@@ -1,5 +1,5 @@
-// 《包記炊粿：手感炊粿大挑戰》
-// 料理媽媽手感 7 道關卡 ＋ 3 級營業場地 ＋ 虛擬高解析自適應 Canvas 引擎
+// 《包記炊粿：顧粿沒那麼簡單》
+// 手感 7 道關卡 ＋ 3 級營業場地 ＋ 全手繪真實透明 Sprite 貼圖 ＋ 自適應 Canvas 引擎
 
 /* =========================================================
    1. 音效合成系統 (Web Audio API)
@@ -82,38 +82,75 @@ const AudioSys = {
 };
 
 /* =========================================================
-   2. 素材圖片預載器 (Preloader)
+   2. 貼圖素材加載器 (Sprites & Photos Loader)
 ========================================================= */
-const Assets = {
-  isoRoom: new Image(),
-  prep: new Image(),
+const Sprites = {
+  // 主角與品牌透明貼圖
+  heroBoss: new Image(),
+  heroGua: new Image(),
+  bossPanic: new Image(),
+
+  // 7 步驟核心透明貼圖
+  radish: new Image(),
+  grater: new Image(),
+  bowl: new Image(),
   wok: new Image(),
-  fire: new Image(),
-  kitchenScene: new Image(),
+  spatula: new Image(),
+  firewood: new Image(),
+  stove: new Image(),
+  steamer: new Image(),
+  skewer: new Image(),
+  cakeBlock: new Image(),
+  plate: new Image(),
   truck: new Image(),
-  win: new Image(),
-  lose: new Image(),
-  bossFront: new Image(),
-  bossBack: new Image(),
-  bossPanic: new Image()
+  rat: new Image(),
+
+  // 場景背景
+  bgKitchen: new Image(),
+  bgPrep: new Image(),
+  bgWok: new Image(),
+  bgFire: new Image()
 };
 
-Assets.isoRoom.src = "assets/iso_kitchen_room.jpg";
-Assets.prep.src = "assets/station_prep.jpg";
-Assets.wok.src = "assets/station_wok.jpg";
-Assets.fire.src = "assets/station_fire.jpg";
-Assets.kitchenScene.src = "assets/ui_kitchen_scene.jpg";
-Assets.truck.src = "assets/ui_rush_truck.jpg";
-Assets.win.src = "assets/ui_win.jpg";
-Assets.lose.src = "assets/ui_lose.jpg";
-Assets.bossFront.src = "正面.jfif";
-Assets.bossBack.src = "背面.jfif";
-Assets.bossPanic.src = "assets/boss_panic.jpg";
+// 綁定檔案路徑
+Sprites.heroBoss.src = "assets/sprites/hero_boss.png";
+Sprites.heroGua.src = "assets/sprites/hero_gua.png";
+Sprites.bossPanic.src = "assets/sprites/boss_panic.png";
+
+Sprites.radish.src = "assets/sprites/radish.png";
+Sprites.grater.src = "assets/sprites/grater.png";
+Sprites.bowl.src = "assets/sprites/bowl.png";
+Sprites.wok.src = "assets/sprites/wok.png";
+Sprites.spatula.src = "assets/sprites/spatula.png";
+Sprites.firewood.src = "assets/sprites/firewood.png";
+Sprites.stove.src = "assets/sprites/stove.png";
+Sprites.steamer.src = "assets/sprites/steamer.png";
+Sprites.skewer.src = "assets/sprites/skewer.png";
+Sprites.cakeBlock.src = "assets/sprites/cake_block.png";
+Sprites.plate.src = "assets/sprites/plate.png";
+Sprites.truck.src = "assets/sprites/truck.png";
+Sprites.rat.src = "assets/sprites/rat.png";
+
+Sprites.bgKitchen.src = "assets/ui_kitchen_scene.jpg";
+Sprites.bgPrep.src = "assets/station_prep.jpg";
+Sprites.bgWok.src = "assets/station_wok.jpg";
+Sprites.bgFire.src = "assets/station_fire.jpg";
+
+// 安全繪製 Sprite 輔助函式
+function drawSprite(ctx, img, cx, cy, w, h, angle = 0, alpha = 1) {
+  if (!img || !img.complete || img.naturalWidth === 0) return;
+  ctx.save();
+  ctx.translate(cx, cy);
+  if (angle !== 0) ctx.rotate(angle);
+  if (alpha < 1) ctx.globalAlpha = Math.max(0, alpha);
+  ctx.drawImage(img, -w / 2, -h / 2, w, h);
+  ctx.restore();
+}
 
 /* =========================================================
    3. 排行榜持久化系統 (Leaderboard)
 ========================================================= */
-const LB_STORAGE_KEY = "bao_cooking_mama_lb_v2";
+const LB_STORAGE_KEY = "bao_cooking_mama_lb_v3";
 const DEFAULT_LB_DATA = [
   { name: "阿嬤炊粿王", score: 2680, level: "年貨大街", time: "09:15" },
   { name: "包記大掌櫃", score: 2180, level: "年貨大街", time: "11:30" },
@@ -188,14 +225,14 @@ const LeaderboardSys = {
 };
 
 /* =========================================================
-   4. 關卡與步驟設定
+   4. 關卡與步驟規格設定
 ========================================================= */
 const LEVELS = [
   {
     id: 1,
     name: "老街早市",
     tag: "新手教學・1籠出餐",
-    desc: "限時充裕，手指引導明確。細細體會 7 道工序的傳統手感！",
+    desc: "限時充裕，手指引導明確。細細體會 7 道傳統工序手感！",
     targetScore: 350,
     batches: 1,
     timeScale: 1.0,
@@ -207,7 +244,7 @@ const LEVELS = [
     id: 2,
     name: "廟口夜市",
     tag: "爆單挑戰・2籠連續",
-    desc: "步驟限時縮短！中途會有貪吃鼠竄出偷吃、急躁客人敲碗催單！",
+    desc: "步驟限時縮短！中途會有老鼠偷吃、急躁客人敲碗催單！",
     targetScore: 900,
     batches: 2,
     timeScale: 0.8,
@@ -218,8 +255,8 @@ const LEVELS = [
   {
     id: 3,
     name: "年貨大街",
-    tag: "極限決戰・3籠連發",
-    desc: "過年人潮洶湧！節奏飛快，手感與反應力的終極考驗！",
+    tag: "極限決戰・雙籠併行",
+    desc: "過年大爆單！炒這籠顧那籠，頂部背景籠蒸煮中需適時補水！",
     targetScore: 1600,
     batches: 3,
     timeScale: 0.65,
@@ -230,10 +267,10 @@ const LEVELS = [
 ];
 
 const STEPS = [
-  { id: 0, num: "①", title: "刨絲", actionHint: "手指在蘿蔔上「來回上下滑動」刨絲！保持綠區節奏！" },
+  { id: 0, num: "①", title: "刨絲", actionHint: "手指在蘿蔔上「來回上下滑動」刨絲！保持在綠區節奏！" },
   { id: 1, num: "②", title: "調漿", actionHint: "按住倒冷水停在「3:1黃金線」！接著「順時針畫圈」攪拌！" },
   { id: 2, num: "③", title: "鐵鑊翻炒", actionHint: "點擊鏟除鍋底焦點！糊化條進濃稠區點起鍋！" },
-  { id: 3, num: "④", title: "添柴", actionHint: "拖曳木柴甩入紅磚灶門！將火力維持在綠區！" },
+  { id: 3, num: "④", title: "添柴", actionHint: "拖曳真實木柴甩入紅磚灶門！將火力維持在綠區！" },
   { id: 4, num: "⑤", title: "蒸粿", actionHint: "大火快蒸，水位低時長按水瓢補水，切勿乾燒！" },
   { id: 5, num: "⑥", title: "竹籤驗收", actionHint: "竹籤指針擺動進「中央綠區」時點擊插籤驗收！" },
   { id: 6, num: "⑦", title: "切塊出貨", actionHint: "劃 3 刀直線切塊，再把盛盤向上滑動甩上發財車！" }
@@ -242,8 +279,8 @@ const STEPS = [
 /* =========================================================
    5. 遊戲主狀態管理器 (State)
 ========================================================= */
-const GW = 420; // 虛擬標準寬度 (Virtual Width)
-const GH = 750; // 虛擬標準高度 (Virtual Height)
+const GW = 420; // 虛擬標準寬度
+const GH = 750; // 虛擬標準高度
 
 const Game = {
   playerName: "炊粿快手",
@@ -272,6 +309,14 @@ const Game = {
   stepDone: false,
   delayToNext: 0,
 
+  // Level 3 雙籠併行狀態 (背景籠蒸煮)
+  dualSteamer: {
+    active: false,
+    water: 80,
+    boilSec: 0,
+    dryWarning: false
+  },
+
   // 干擾事件 (老鼠 / 客人)
   distractions: [],
   distractionTimer: 0,
@@ -280,27 +325,28 @@ const Game = {
   floatingTexts: [],
   shakeTime: 0,
   bossMood: "NORMAL", // NORMAL, PANIC, HAPPY
-  bossSpeech: "「看準時機，用心炊粿！」"
+  bossSpeech: "「顧粿沒那麼簡單，看準手感！」"
 };
 
 /* =========================================================
-   6. 7 道手感關卡的邏輯與繪製 (Cooking Mama Mechanics)
+   6. 7 道手感關卡的邏輯與全 Sprite 貼圖繪製
 ========================================================= */
 
 // ---------------------------------------------------------
-// ① 刨絲 (上下來回滑動，控制速度計在綠區)
+// ① 刨絲 (刨絲板 + 蘿蔔 + 陶瓷大盆)
 // ---------------------------------------------------------
 function initStep0() {
   const ts = LEVELS[Game.levelIdx].timeScale;
   Game.stepMaxTime = 8.5 * ts;
   Game.stepTimer = Game.stepMaxTime;
   Game.bossMood = "NORMAL";
-  Game.bossSpeech = "「跟著節奏刨，太快會刨到手喔！」";
+  Game.bossSpeech = "「跟著節奏刨，太急太快會刨到手喔！」";
 
   Game.stepState = {
     progress: 0, // 0 ~ 100
     grams: 0,    // 0 ~ 1200g
     radishY: 0,
+    radishAngle: 0.1,
     lastY: null,
     speedMeter: 0,
     hurtTimer: 0,
@@ -315,22 +361,22 @@ function updateStep0(dt) {
     s.hurtTimer -= dt;
     s.speedMeter = 0;
     Game.bossMood = "PANIC";
-    Game.bossSpeech = "「唉唷！小心刨到手了！」";
+    Game.bossSpeech = "「唉唷痛痛痛！刨到手指啦！」";
     return;
   } else if (Game.bossMood === "PANIC") {
     Game.bossMood = "NORMAL";
     Game.bossSpeech = "「穩住節奏，再來！」";
   }
 
-  s.speedMeter = Math.max(0, s.speedMeter - dt * 2.6);
+  s.speedMeter = Math.max(0, s.speedMeter - dt * 2.5);
 
-  // 粒子更新
+  // 刨落蘿蔔絲粒子更新
   for (let i = s.particles.length - 1; i >= 0; i--) {
     const p = s.particles[i];
     p.x += p.vx * dt;
     p.y += p.vy * dt;
-    p.vy += 800 * dt;
-    p.alpha -= dt * 2.2;
+    p.vy += 850 * dt;
+    p.alpha -= dt * 2.4;
     if (p.alpha <= 0) s.particles.splice(i, 1);
   }
 
@@ -338,109 +384,74 @@ function updateStep0(dt) {
     let grade = "PERFECT";
     if (s.cutsCount > 1 || Game.stepTimer <= 1.0) grade = "FAIL";
     else if (s.cutsCount === 1) grade = "GOOD";
-    finishCurrentStep(grade, grade === "PERFECT" ? "粗細均勻無傷手！" : s.cutsCount > 0 ? "些微削到手！" : "及格削完！");
+    finishCurrentStep(grade, grade === "PERFECT" ? "粗細均勻無傷手！" : s.cutsCount > 0 ? "削到手指扣分！" : "及格削完！");
   }
 }
 
 function drawStep0(ctx) {
   const s = Game.stepState;
 
-  // 1. 刨絲桌木盆背景
-  drawBackdrop(ctx, Assets.prep, 0.45);
+  // 1. 場景背景
+  drawBackdrop(ctx, Sprites.bgPrep, 0.4);
 
-  // 2. 刨絲木盆台
-  ctx.fillStyle = "#8d5b32";
-  ctx.fillRect(40, 360, 340, 290);
-  ctx.fillStyle = "#5c3a1e";
-  ctx.fillRect(55, 375, 310, 260);
+  // 2. 接絲的青花瓷大盆 (Sprite)
+  drawSprite(ctx, Sprites.bowl, 210, 560, 290, 290);
 
-  // 金屬斜面刨絲板
-  ctx.save();
-  ctx.translate(210, 480);
-  ctx.fillStyle = "#bdc3c7";
-  ctx.roundRect(-80, -110, 160, 220, 10);
-  ctx.fill();
-  ctx.strokeStyle = "#7f8c8d";
-  ctx.lineWidth = 4;
-  ctx.stroke();
-
-  // 刀孔
-  ctx.fillStyle = "#2c3e50";
-  for (let r = -85; r <= 85; r += 24) {
-    for (let c = -50; c <= 50; c += 26) {
-      ctx.fillRect(c, r, 12, 4);
+  // 3. 累積在盆裡的潔白蘿蔔絲堆
+  const heapRatio = s.progress / 100;
+  if (heapRatio > 0.05) {
+    ctx.save();
+    ctx.fillStyle = "rgba(255, 255, 255, 0.92)";
+    ctx.beginPath();
+    ctx.ellipse(210, 560, 105 * heapRatio, 55 * heapRatio, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // 絲狀線條
+    ctx.strokeStyle = "#e8dfd0";
+    ctx.lineWidth = 2;
+    for (let i = 0; i < 12 * heapRatio; i++) {
+      ctx.beginPath();
+      ctx.arc(210 + (Math.sin(i * 1.5) * 60 * heapRatio), 560 + (Math.cos(i * 2.1) * 25 * heapRatio), 14, 0, Math.PI);
+      ctx.stroke();
     }
+    ctx.restore();
   }
-  ctx.restore();
 
-  // 累積的蘿蔔絲堆
-  const heapH = (s.progress / 100) * 85;
-  ctx.fillStyle = "#f8f9fa";
-  ctx.beginPath();
-  ctx.ellipse(210, 610, 130, heapH * 0.6, 0, 0, Math.PI * 2);
-  ctx.fill();
+  // 4. 刨絲板 (Sprite) 傾斜架在盆上
+  drawSprite(ctx, Sprites.grater, 210, 440, 165, 295, -0.06);
 
-  // 噴濺蘿蔔絲
+  // 5. 噴濺蘿蔔絲粒子
   for (const p of s.particles) {
     ctx.strokeStyle = `rgba(255, 255, 255, ${p.alpha})`;
-    ctx.lineWidth = 3;
+    ctx.lineWidth = 3.5;
     ctx.beginPath();
     ctx.moveTo(p.x, p.y);
     ctx.lineTo(p.x + p.vx * 0.04, p.y + p.vy * 0.04);
     ctx.stroke();
   }
 
-  // 白蘿蔔本體 (隨手勢上下滑動)
-  const ry = 410 + s.radishY;
-  ctx.save();
-  ctx.translate(210, ry);
+  // 6. 白蘿蔔本體 (Sprite) 隨玩家手勢在刨絲板上上下摩擦滑動
+  const ry = 425 + s.radishY;
+  const rx = 210 + Math.sin(s.radishY * 0.05) * 12;
+  drawSprite(ctx, Sprites.radish, rx, ry, 120, 185, s.radishAngle);
 
-  // 綠葉
-  ctx.fillStyle = "#27ae60";
-  ctx.beginPath();
-  ctx.moveTo(0, -95);
-  ctx.lineTo(-24, -135);
-  ctx.lineTo(0, -120);
-  ctx.lineTo(24, -135);
-  ctx.closePath();
-  ctx.fill();
-
-  // 白蘿蔔
-  ctx.fillStyle = "#ffffff";
-  ctx.strokeStyle = "#dcdde1";
-  ctx.lineWidth = 3.5;
-  ctx.beginPath();
-  ctx.ellipse(0, 0, 52, 90, 0, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.stroke();
-
-  // 削切紋理
-  ctx.strokeStyle = "#e1b12c";
-  ctx.lineWidth = 2.5;
-  for (let i = -45; i <= 45; i += 20) {
-    ctx.beginPath();
-    ctx.arc(0, i, 38, 0.2, Math.PI - 0.2);
-    ctx.stroke();
-  }
-  ctx.restore();
-
-  // 刨到手紅閃提示
+  // 7. 削到手紅閃提示
   if (s.hurtTimer > 0) {
     ctx.fillStyle = "rgba(231, 76, 60, 0.45)";
     ctx.fillRect(0, 0, GW, GH);
-    ctx.fillStyle = "#c0392b";
-    ctx.font = "900 26px sans-serif";
-    ctx.textAlign = "center";
-    ctx.fillText("🩸 唉唷！刨到手了！", 210, 310);
-    ctx.font = "800 16px sans-serif";
+    drawSprite(ctx, Sprites.bossPanic, 210, 290, 140, 140);
     ctx.fillStyle = "#fff";
-    ctx.fillText("太急躁失控！停頓痛擊中...", 210, 340);
+    ctx.font = "900 24px sans-serif";
+    ctx.textAlign = "center";
+    ctx.strokeStyle = "#800";
+    ctx.lineWidth = 4;
+    ctx.strokeText("🩸 刨到手啦！痛擊停頓中...", 210, 380);
+    ctx.fillText("🩸 刨到手啦！痛擊停頓中...", 210, 380);
   }
 
-  // 速度計 (右側)
-  drawSpeedGauge(ctx, 365, 410, 22, 180, s.speedMeter);
+  // 8. 速度計 (右側)
+  drawSpeedGauge(ctx, 370, 390, 22, 180, s.speedMeter);
 
-  // 頂部目標說明
+  // 9. 頂部任務橫幅
   drawStepBanner(ctx, `🥕 白蘿蔔刨絲：${s.grams}g / 1200g`, STEPS[0].actionHint);
 }
 
@@ -453,35 +464,36 @@ function handlePointerStep0(type, x, y) {
   } else if (type === "move") {
     if (s.lastY === null) s.lastY = y;
     const dy = y - s.lastY;
-    s.radishY = Math.max(-65, Math.min(65, s.radishY + dy * 0.65));
+    s.radishY = Math.max(-85, Math.min(85, s.radishY + dy * 0.7));
+    s.radishAngle = (dy > 0 ? 0.15 : -0.15);
 
     if (Math.abs(dy) > 8) {
       const spd = Math.abs(dy) / 8;
-      s.speedMeter = Math.min(1.0, s.speedMeter + spd * 0.08);
+      s.speedMeter = Math.min(1.0, s.speedMeter + spd * 0.085);
 
       // 太快削到手！
       if (s.speedMeter > 0.88) {
-        s.hurtTimer = 1.3;
+        s.hurtTimer = 1.35;
         s.cutsCount++;
         s.speedMeter = 0;
         AudioSys.ouch();
         shake(14);
-        addFloatingNotice("🩸 刨到手扣分！", 210, 320, "#ff7675");
+        addFloatingNotice("🩸 刨到手扣分！", 210, 330, "#ff7675");
         return;
       }
 
       // 綠區有效削絲
       if (s.speedMeter >= 0.22 && s.speedMeter <= 0.85) {
-        s.progress = Math.min(100, s.progress + 4.2);
+        s.progress = Math.min(100, s.progress + 4.0);
         s.grams = Math.min(1200, Math.round((s.progress / 100) * 1200));
         AudioSys.chop();
 
-        for (let i = 0; i < 2; i++) {
+        for (let i = 0; i < 3; i++) {
           s.particles.push({
             x: 210 + (Math.random() - 0.5) * 60,
-            y: 500 + (Math.random() - 0.5) * 40,
+            y: 460 + (Math.random() - 0.5) * 40,
             vx: (Math.random() - 0.5) * 220,
-            vy: -160 - Math.random() * 200,
+            vy: -140 - Math.random() * 180,
             alpha: 1.0
           });
         }
@@ -491,18 +503,19 @@ function handlePointerStep0(type, x, y) {
   } else if (type === "up") {
     s.lastY = null;
     s.radishY = 0;
+    s.radishAngle = 0.1;
   }
 }
 
 // ---------------------------------------------------------
-// ② 調漿 (按住倒水停在 3:1 ＋ 順時針畫圈攪拌打散粉粒)
+// ② 調漿 (注水停在 3:1 ＋ 青花瓷盆畫圈攪拌消粉粒)
 // ---------------------------------------------------------
 function initStep1() {
   const ts = LEVELS[Game.levelIdx].timeScale;
   Game.stepMaxTime = 10 * ts;
   Game.stepTimer = Game.stepMaxTime;
   Game.bossMood = "NORMAL";
-  Game.bossSpeech = "「倒水要準，米粉才不會結塊！」";
+  Game.bossSpeech = "「倒水要看準 3:1，接著快把粉粒攪散！」";
 
   Game.stepState = {
     phase: "POUR", // POUR -> STIR
@@ -512,15 +525,17 @@ function initStep1() {
 
     // 攪拌
     stirProgress: 0,
-    lumps: Array.from({ length: 14 }, () => ({
-      x: (Math.random() - 0.5) * 170,
-      y: (Math.random() - 0.5) * 170,
-      r: 9 + Math.random() * 7,
+    lumps: Array.from({ length: 15 }, () => ({
+      x: (Math.random() - 0.5) * 140,
+      y: (Math.random() - 0.5) * 140,
+      r: 10 + Math.random() * 8,
       alive: true
     })),
     lastAngle: null,
     totalAngle: 0,
-    whiskAngle: 0
+    whiskAngle: 0.5,
+    whiskX: 260,
+    whiskY: 460
   };
 }
 
@@ -536,80 +551,71 @@ function updateStep1(dt) {
       let grade = "PERFECT";
       if (s.pourGrade === "FAIL" || Game.stepTimer <= 1.0) grade = "FAIL";
       else if (s.pourGrade === "GOOD") grade = "GOOD";
-      finishCurrentStep(grade, grade === "PERFECT" ? "黃金 3:1 粉粒全散，質地絲滑！" : "粉漿完成！");
+      finishCurrentStep(grade, grade === "PERFECT" ? "3:1 黃金比例，粉粒全散！" : "粉漿完成！");
     }
   }
 }
 
 function drawStep1(ctx) {
   const s = Game.stepState;
-  drawBackdrop(ctx, Assets.prep, 0.45);
+  drawBackdrop(ctx, Sprites.bgPrep, 0.4);
 
-  // 陶瓷大米漿盆 (俯視)
-  ctx.save();
-  ctx.translate(210, 460);
+  // 1. 青花瓷大米漿盆 (Sprite)
+  drawSprite(ctx, Sprites.bowl, 210, 460, 310, 310);
 
-  ctx.fillStyle = "#2c3e50";
-  ctx.beginPath();
-  ctx.ellipse(0, 0, 160, 160, 0, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.fillStyle = "#ecf0f1";
-  ctx.beginPath();
-  ctx.ellipse(0, 0, 150, 150, 0, 0, Math.PI * 2);
-  ctx.fill();
-
-  // 米漿液體
-  if (s.waterRatio > 0.08) {
-    const alpha = Math.min(1.0, 0.4 + s.waterRatio * 0.6);
-    ctx.fillStyle = `rgba(247, 241, 227, ${alpha})`;
+  // 2. 盆中米漿液體
+  if (s.waterRatio > 0.05) {
+    const alpha = Math.min(0.95, 0.45 + s.waterRatio * 0.5);
+    ctx.fillStyle = `rgba(247, 243, 233, ${alpha})`;
     ctx.beginPath();
-    ctx.ellipse(0, 0, 142, 142, 0, 0, Math.PI * 2);
+    ctx.ellipse(210, 460, 110, 110, 0, 0, Math.PI * 2);
     ctx.fill();
+
+    // 蘿蔔碎絲沈浸在盆內
+    ctx.fillStyle = "#eedfc8";
+    for (let i = 0; i < 18; i++) {
+      const ox = 210 + Math.sin(i * 1.8) * 75;
+      const oy = 460 + Math.cos(i * 1.8) * 75;
+      ctx.fillRect(ox, oy, 7, 3);
+    }
   }
 
-  // 麵粉顆粒 (Stir 階段)
+  // 3. 麵粉顆粒 (結塊)
   if (s.phase === "STIR") {
-    ctx.fillStyle = "#dfe4ea";
+    ctx.fillStyle = "#e0d6c3";
     for (const lump of s.lumps) {
       if (lump.alive) {
         ctx.beginPath();
-        ctx.arc(lump.x, lump.y, lump.r, 0, Math.PI * 2);
+        ctx.arc(210 + lump.x, 460 + lump.y, lump.r, 0, Math.PI * 2);
         ctx.fill();
+        ctx.strokeStyle = "#c8bca7";
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
       }
     }
 
-    // 攪拌木杓
-    ctx.save();
-    ctx.rotate(s.whiskAngle);
-    ctx.fillStyle = "#cd6133";
-    ctx.fillRect(-7, -135, 14, 125);
-    ctx.beginPath();
-    ctx.arc(0, 0, 24, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
+    // 攪拌木柄鍋鏟 (Sprite) 跟隨旋轉
+    drawSprite(ctx, Sprites.spatula, s.whiskX, s.whiskY, 150, 150, s.whiskAngle);
   }
-
-  ctx.restore();
 
   // Phase 1：注水刻度柱
   if (s.phase === "POUR") {
-    const bx = 38;
-    const by = 310;
-    const bw = 32;
-    const bh = 240;
+    const bx = 32;
+    const by = 290;
+    const bw = 34;
+    const bh = 250;
 
-    ctx.fillStyle = "rgba(0,0,0,0.6)";
+    ctx.fillStyle = "rgba(0,0,0,0.65)";
     ctx.roundRect(bx, by, bw, bh, 8);
     ctx.fill();
 
     // 3:1 目標線 (約 65% 高度)
     const targetY = by + bh * (1 - 0.65);
-    ctx.fillStyle = "rgba(46, 204, 113, 0.5)";
-    ctx.fillRect(bx, targetY - 15, bw, 30);
+    ctx.fillStyle = "rgba(46, 204, 113, 0.55)";
+    ctx.fillRect(bx, targetY - 16, bw, 32);
     ctx.strokeStyle = "#2ecc71";
     ctx.lineWidth = 3;
-    ctx.strokeRect(bx, targetY - 15, bw, 30);
+    ctx.strokeRect(bx, targetY - 16, bw, 32);
 
     // 當前水位
     const fillH = bh * s.waterRatio;
@@ -619,28 +625,28 @@ function drawStep1(ctx) {
     ctx.fillStyle = "#fff";
     ctx.font = "900 13px sans-serif";
     ctx.textAlign = "left";
-    ctx.fillText("3:1 黃金線", bx + bw + 8, targetY + 5);
+    ctx.fillText("3:1 黃金刻度", bx + bw + 8, targetY + 5);
 
     // 水柱效果
     if (s.holdingPour) {
-      ctx.fillStyle = "#3498db";
-      ctx.fillRect(205, 300, 10, 160);
+      ctx.fillStyle = "#5dade2";
+      ctx.fillRect(205, 270, 10, 190);
     }
 
     // 長按倒水大按鈕
-    ctx.fillStyle = s.holdingPour ? "#27ae60" : "#e67e22";
+    ctx.fillStyle = s.holdingPour ? "#27ae60" : "#d35400";
     ctx.beginPath();
-    ctx.roundRect(80, 640, 260, 58, 16);
+    ctx.roundRect(75, 640, 270, 58, 16);
     ctx.fill();
     ctx.fillStyle = "#fff";
-    ctx.font = "900 19px sans-serif";
+    ctx.font = "900 20px sans-serif";
     ctx.textAlign = "center";
-    ctx.fillText(s.holdingPour ? "💧 注水中...放開停！" : "👉 按住此處注水", 210, 676);
+    ctx.fillText(s.holdingPour ? "💧 注水中...看準放開！" : "👉 按住此處注水", 210, 676);
 
     drawStepBanner(ctx, "🚰 倒冷水調米粉：停在 3:1 刻度！", STEPS[1].actionHint);
   } else {
     // Phase 2：畫圈攪拌
-    drawStepBanner(ctx, `🥣 畫圈攪拌消粉粒：${Math.round(s.stirProgress)}%`, "手指在盆中「順時針畫大圈」打散結塊！");
+    drawStepBanner(ctx, `🥣 畫圈攪拌消粉粒：${Math.round(s.stirProgress)}%`, "手指在青花瓷盆「順時針畫大圈」打散結塊！");
   }
 }
 
@@ -677,7 +683,9 @@ function handlePointerStep1(type, x, y) {
       const cx = 210;
       const cy = 460;
       const angle = Math.atan2(y - cy, x - cx);
-      s.whiskAngle = angle;
+      s.whiskAngle = angle + 0.8;
+      s.whiskX = x;
+      s.whiskY = y;
 
       if (s.lastAngle !== null) {
         let da = angle - s.lastAngle;
@@ -685,7 +693,7 @@ function handlePointerStep1(type, x, y) {
         if (da < -Math.PI) da += Math.PI * 2;
         if (Math.abs(da) > 0.08) {
           s.totalAngle += Math.abs(da);
-          s.stirProgress = Math.min(100, (s.totalAngle / (Math.PI * 9)) * 100);
+          s.stirProgress = Math.min(100, (s.totalAngle / (Math.PI * 8.5)) * 100);
           AudioSys.stir();
 
           const remain = Math.round((1 - s.stirProgress / 100) * s.lumps.length);
@@ -700,14 +708,14 @@ function handlePointerStep1(type, x, y) {
 }
 
 // ---------------------------------------------------------
-// ③ 鐵鑊翻炒 (點擊消除鍋底焦點 ＋ 濃稠區按起鍋)
+// ③ 鐵鑊翻炒 (大黑鐵鑊 + 木柄鍋鏟 + 焦點消滅 + 起鍋)
 // ---------------------------------------------------------
 function initStep2() {
   const ts = LEVELS[Game.levelIdx].timeScale;
   Game.stepMaxTime = 11 * ts;
   Game.stepTimer = Game.stepMaxTime;
   Game.bossMood = "NORMAL";
-  Game.bossSpeech = "「鍋底冒黑斑要快鏟掉，米糰到濃稠區起鍋！」";
+  Game.bossSpeech = "「鍋底冒焦點要快鏟掉，米糰到濃稠黃金區起鍋！」";
 
   Game.stepState = {
     gelatin: 15, // 0 ~ 100
@@ -715,7 +723,8 @@ function initStep2() {
     spawnTimer: 0.5,
     burntCount: 0,
     stopped: false,
-    flameFx: 0
+    flameFx: 0,
+    spatulaPos: { x: 270, y: 460, angle: 0.6 }
   };
 }
 
@@ -729,13 +738,13 @@ function updateStep2(dt) {
   s.spawnTimer -= dt;
   if (s.spawnTimer <= 0 && s.hotspots.length < 5) {
     s.spawnTimer = 0.7 + Math.random() * 0.5;
-    const r = Math.random() * 110;
+    const r = Math.random() * 95;
     const a = Math.random() * Math.PI * 2;
     s.hotspots.push({
       x: Math.cos(a) * r,
       y: Math.sin(a) * r * 0.72,
       timer: 1.7,
-      radius: 19 + Math.random() * 8
+      radius: 20 + Math.random() * 8
     });
     AudioSys.sizzle();
   }
@@ -766,36 +775,29 @@ function updateStep2(dt) {
 
 function drawStep2(ctx) {
   const s = Game.stepState;
-  drawBackdrop(ctx, Assets.wok, 0.45);
+  drawBackdrop(ctx, Sprites.bgWok, 0.4);
 
-  // 大鐵鑊外型
+  // 1. 大黑鐵鑊 (Sprite)
+  drawSprite(ctx, Sprites.wok, 210, 430, 340, 280);
+
+  // 2. 鐵鑊中米糰成團 (隨糊化變深金黃)
+  const gRatio = s.gelatin / 100;
   ctx.save();
   ctx.translate(210, 430);
-
-  ctx.fillStyle = "#1e272e";
+  ctx.fillStyle = gRatio > 0.8 ? "#f3d18c" : "#f7f1e3";
   ctx.beginPath();
-  ctx.ellipse(0, 0, 185, 145, 0, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.strokeStyle = "#485460";
-  ctx.lineWidth = 9;
-  ctx.stroke();
-
-  // 鍋中米糰 (隨糊化加深顏色)
-  const gRatio = s.gelatin / 100;
-  ctx.fillStyle = gRatio > 0.8 ? "#f5cd79" : "#f7f1e3";
-  ctx.beginPath();
-  ctx.ellipse(0, 0, 162, 125, 0, 0, Math.PI * 2);
+  ctx.ellipse(0, 0, 115, 88, 0, 0, Math.PI * 2);
   ctx.fill();
 
-  // 油蔥酥爆香點
-  ctx.fillStyle = "#833471";
-  for (let i = 0; i < 20; i++) {
-    const ox = ((i * 41) % 210) - 105;
-    const oy = ((i * 59) % 160) - 80;
-    ctx.fillRect(ox, oy, 6, 4);
+  // 紅蔥頭爆香顆粒
+  ctx.fillStyle = "#8e3a24";
+  for (let i = 0; i < 18; i++) {
+    const ox = ((i * 37) % 170) - 85;
+    const oy = ((i * 53) % 120) - 60;
+    ctx.fillRect(ox, oy, 7, 4);
   }
 
-  // 焦點斑塊
+  // 3. 焦點斑塊
   for (const h of s.hotspots) {
     const urgency = 1 - (h.timer / 1.7);
     ctx.fillStyle = urgency > 0.6 ? "#e74c3c" : "#e67e22";
@@ -815,33 +817,36 @@ function drawStep2(ctx) {
 
   // 燒焦紅閃
   if (s.flameFx > 0) {
-    ctx.fillStyle = `rgba(231, 76, 60, ${s.flameFx * 0.45})`;
+    ctx.fillStyle = `rgba(231, 76, 60, ${s.flameFx * 0.5})`;
     ctx.beginPath();
-    ctx.ellipse(0, 0, 165, 128, 0, 0, Math.PI * 2);
+    ctx.ellipse(0, 0, 120, 92, 0, 0, Math.PI * 2);
     ctx.fill();
   }
   ctx.restore();
 
-  // 糊化指示條
+  // 4. 木柄鍋鏟 (Sprite) 隨點擊揮動
+  drawSprite(ctx, Sprites.spatula, s.spatulaPos.x, s.spatulaPos.y, 140, 140, s.spatulaPos.angle);
+
+  // 5. 糊化進度指示條
   const bx = 45;
   const by = 210;
   const bw = 330;
   const bh = 24;
 
-  ctx.fillStyle = "rgba(0,0,0,0.6)";
+  ctx.fillStyle = "rgba(0,0,0,0.65)";
   ctx.roundRect(bx, by, bw, bh, 8);
   ctx.fill();
 
-  // 綠區 (78% ~ 93%)
+  // 濃稠黃金區 (78% ~ 93%)
   const zx = bx + bw * 0.78;
   const zw = bw * 0.15;
-  ctx.fillStyle = "rgba(46, 204, 113, 0.55)";
+  ctx.fillStyle = "rgba(46, 204, 113, 0.6)";
   ctx.fillRect(zx, by, zw, bh);
   ctx.strokeStyle = "#2ecc71";
   ctx.lineWidth = 2.5;
   ctx.strokeRect(zx, by, zw, bh);
 
-  // 進度
+  // 當前糊化條
   ctx.fillStyle = s.gelatin > 93 ? "#e74c3c" : "#f39c12";
   ctx.fillRect(bx + 2, by + 2, (bw - 4) * (s.gelatin / 100), bh - 4);
 
@@ -881,12 +886,18 @@ function handlePointerStep2(type, x, y) {
       return;
     }
 
+    // 揮鏟動作
+    s.spatulaPos.x = x;
+    s.spatulaPos.y = y;
+    s.spatulaPos.angle = -0.4;
+    setTimeout(() => { s.spatulaPos.angle = 0.6; }, 180);
+
     // 檢查點擊鏟除焦點
     const cx = 210;
     const cy = 430;
     for (let i = s.hotspots.length - 1; i >= 0; i--) {
       const h = s.hotspots[i];
-      if (Math.hypot(x - (cx + h.x), y - (cy + h.y)) <= h.radius + 18) {
+      if (Math.hypot(x - (cx + h.x), y - (cy + h.y)) <= h.radius + 24) {
         s.hotspots.splice(i, 1);
         AudioSys.chop();
         addFloatingNotice("✨ 鏟掉！", cx + h.x, cy + h.y - 15, "#2ecc71");
@@ -897,23 +908,23 @@ function handlePointerStep2(type, x, y) {
 }
 
 // ---------------------------------------------------------
-// ④ 添柴 (將木柴拖甩進紅磚灶門，維持火力在綠區)
+// ④ 添柴 (紅磚柴燒大灶 + 真實相思木木柴拖甩 + 火力綠區)
 // ---------------------------------------------------------
 function initStep3() {
   const ts = LEVELS[Game.levelIdx].timeScale;
   Game.stepMaxTime = 8.5 * ts;
   Game.stepTimer = Game.stepMaxTime;
   Game.bossMood = "NORMAL";
-  Game.bossSpeech = "「把柴火甩進灶門，火溫要維持在綠區！」";
+  Game.bossSpeech = "「把相思木柴甩進灶門，火候要顧在綠區！」";
 
   Game.stepState = {
     temp: 50,
     inGreenSec: 0,
     requiredGreenSec: 4.0 * ts,
     logs: [
-      { id: 1, x: 90, y: 590 },
-      { id: 2, x: 210, y: 590 },
-      { id: 3, x: 330, y: 590 }
+      { id: 1, x: 90, y: 590, angle: -0.1 },
+      { id: 2, x: 210, y: 590, angle: 0.05 },
+      { id: 3, x: 330, y: 590, angle: 0.12 }
     ],
     dragLog: null,
     dragOff: { x: 0, y: 0 }
@@ -932,8 +943,9 @@ function updateStep3(dt) {
   if (s.logs.length < 3) {
     s.logs.push({
       id: Date.now() + Math.random(),
-      x: 70 + Math.random() * 280,
-      y: 590
+      x: 80 + Math.random() * 260,
+      y: 590,
+      angle: (Math.random() - 0.5) * 0.2
     });
   }
 
@@ -947,62 +959,39 @@ function updateStep3(dt) {
 
 function drawStep3(ctx) {
   const s = Game.stepState;
-  drawBackdrop(ctx, Assets.fire, 0.45);
+  drawBackdrop(ctx, Sprites.bgFire, 0.4);
 
-  // 紅磚大灶門
-  ctx.save();
-  ctx.translate(210, 390);
+  // 1. 紅磚大柴灶 (Sprite)
+  drawSprite(ctx, Sprites.stove, 210, 400, 310, 220);
 
-  ctx.fillStyle = "#c0392b";
-  ctx.roundRect(-140, -110, 280, 210, 16);
-  ctx.fill();
-  ctx.strokeStyle = "#7f1d1d";
-  ctx.lineWidth = 6;
-  ctx.stroke();
-
-  // 灶門黑洞 (目標)
-  ctx.fillStyle = "#1e120d";
-  ctx.beginPath();
-  ctx.arc(0, 15, 75, Math.PI, 0, false);
-  ctx.rect(-75, 15, 150, 75);
-  ctx.fill();
-
-  // 洞內火焰光
+  // 2. 灶門內火焰光與粒子
   const fRatio = s.temp / 100;
-  const grad = ctx.createRadialGradient(0, 45, 10, 0, 45, 80 * fRatio);
+  ctx.save();
+  ctx.translate(210, 420);
+  const grad = ctx.createRadialGradient(0, 15, 8, 0, 15, 65 * fRatio);
   grad.addColorStop(0, "#f39c12");
-  grad.addColorStop(0.7, "#e74c3c");
+  grad.addColorStop(0.65, "#e74c3c");
   grad.addColorStop(1, "rgba(231,76,60,0)");
   ctx.fillStyle = grad;
   ctx.beginPath();
-  ctx.arc(0, 45, 75, 0, Math.PI * 2);
+  ctx.arc(0, 15, 65, 0, Math.PI * 2);
   ctx.fill();
   ctx.restore();
 
-  // 溫度計
-  drawThermometer(ctx, 365, 290, 24, 180, s.temp, 70, 90);
+  // 3. 火力溫度計
+  drawThermometer(ctx, 370, 280, 24, 180, s.temp, 70, 90);
 
-  // 柴堆托盤
-  ctx.fillStyle = "rgba(0,0,0,0.45)";
-  ctx.roundRect(30, 540, 360, 100, 16);
+  // 4. 下方柴薪置放托盤
+  ctx.fillStyle = "rgba(0,0,0,0.55)";
+  ctx.roundRect(30, 535, 360, 110, 16);
   ctx.fill();
+  ctx.strokeStyle = "#8d5b32";
+  ctx.lineWidth = 3;
+  ctx.stroke();
 
-  // 木柴
+  // 5. 真實相思木木柴 (Sprite)
   for (const log of s.logs) {
-    ctx.save();
-    ctx.translate(log.x, log.y);
-    ctx.fillStyle = "#a0522d";
-    ctx.roundRect(-36, -18, 72, 36, 9);
-    ctx.fill();
-    ctx.strokeStyle = "#5c2c16";
-    ctx.lineWidth = 3;
-    ctx.stroke();
-
-    ctx.strokeStyle = "#d29054";
-    ctx.beginPath();
-    ctx.arc(-22, 0, 8, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.restore();
+    drawSprite(ctx, Sprites.firewood, log.x, log.y, 115, 68, log.angle);
   }
 
   drawStepBanner(ctx, `🔥 柴火溫控：${Math.round(s.temp)}°C`, STEPS[3].actionHint);
@@ -1012,7 +1001,7 @@ function handlePointerStep3(type, x, y) {
   const s = Game.stepState;
   if (type === "down") {
     for (const log of s.logs) {
-      if (Math.hypot(x - log.x, y - log.y) <= 42) {
+      if (Math.hypot(x - log.x, y - log.y) <= 48) {
         s.dragLog = log;
         s.dragOff.x = x - log.x;
         s.dragOff.y = y - log.y;
@@ -1026,11 +1015,11 @@ function handlePointerStep3(type, x, y) {
     }
   } else if (type === "up") {
     if (s.dragLog) {
-      // 投進灶門 (210, 400)
-      if (Math.hypot(s.dragLog.x - 210, s.dragLog.y - 400) <= 95) {
-        s.temp = Math.min(100, s.temp + 28);
+      // 投進紅磚灶門 (210, 420)
+      if (Math.hypot(s.dragLog.x - 210, s.dragLog.y - 420) <= 90) {
+        s.temp = Math.min(100, s.temp + 26);
         AudioSys.woodThump();
-        addFloatingNotice("🪵 添柴大火 +28°C！", 210, 330, "#f39c12");
+        addFloatingNotice("🪵 添相思柴 +26°C！", 210, 330, "#f39c12");
         const idx = s.logs.indexOf(s.dragLog);
         if (idx !== -1) s.logs.splice(idx, 1);
       } else {
@@ -1042,14 +1031,14 @@ function handlePointerStep3(type, x, y) {
 }
 
 // ---------------------------------------------------------
-// ⑤ 蒸粿 (快蒸 ＋ 長按水瓢補水防乾燒)
+// ⑤ 蒸粿 (竹蒸籠 + 滾沸蒸氣 + 長按補水防乾燒)
 // ---------------------------------------------------------
 function initStep4() {
   const ts = LEVELS[Game.levelIdx].timeScale;
   Game.stepMaxTime = 10 * ts;
   Game.stepTimer = Game.stepMaxTime;
   Game.bossMood = "NORMAL";
-  Game.bossSpeech = "「大火快蒸，外鍋水快沒了要趕快補！」";
+  Game.bossSpeech = "「大火快蒸，外鍋快沒水時按住水瓢補水！」";
 
   Game.stepState = {
     cook: 0,
@@ -1082,22 +1071,22 @@ function updateStep4(dt) {
     }
   }
 
-  // 蒸氣
+  // 蒸氣白霧
   if (s.water > 0) {
     s.puffs.push({
-      x: 210 + (Math.random() - 0.5) * 80,
-      y: 350,
-      vy: -130 - Math.random() * 80,
-      r: 12 + Math.random() * 10,
-      alpha: 0.65
+      x: 210 + (Math.random() - 0.5) * 90,
+      y: 330,
+      vy: -140 - Math.random() * 80,
+      r: 14 + Math.random() * 12,
+      alpha: 0.7
     });
   }
 
   for (let i = s.puffs.length - 1; i >= 0; i--) {
     const p = s.puffs[i];
     p.y += p.vy * dt;
-    p.r += dt * 14;
-    p.alpha -= dt * 0.9;
+    p.r += dt * 15;
+    p.alpha -= dt * 0.95;
     if (p.alpha <= 0) s.puffs.splice(i, 1);
   }
 
@@ -1111,9 +1100,9 @@ function updateStep4(dt) {
 
 function drawStep4(ctx) {
   const s = Game.stepState;
-  drawBackdrop(ctx, Assets.kitchenScene, 0.45);
+  drawBackdrop(ctx, Sprites.bgKitchen, 0.4);
 
-  // 蒸氣粒子
+  // 1. 蒸氣粒子
   for (const p of s.puffs) {
     ctx.fillStyle = `rgba(255, 255, 255, ${p.alpha})`;
     ctx.beginPath();
@@ -1121,50 +1110,17 @@ function drawStep4(ctx) {
     ctx.fill();
   }
 
-  // 巨型竹蒸籠
-  ctx.save();
-  ctx.translate(210, 440);
+  // 2. 底下紅磚灶 (Sprite)
+  drawSprite(ctx, Sprites.stove, 210, 520, 260, 180);
 
-  // 外鍋金屬水槽
-  ctx.fillStyle = "#7f8c8d";
-  ctx.roundRect(-120, 50, 240, 60, 10);
-  ctx.fill();
+  // 3. 巨型竹蒸籠 (Sprite)
+  drawSprite(ctx, Sprites.steamer, 210, 420, 220, 290);
 
-  // 竹蒸籠兩層
-  for (let i = 0; i < 2; i++) {
-    const y = -35 + i * 44;
-    ctx.fillStyle = "#e67e22";
-    ctx.roundRect(-100, y, 200, 40, 8);
-    ctx.fill();
-    ctx.strokeStyle = "#b35400";
-    ctx.lineWidth = 3;
-    ctx.stroke();
-
-    ctx.strokeStyle = "#f39c12";
-    for (let x = -90; x <= 90; x += 18) {
-      ctx.beginPath();
-      ctx.moveTo(x, y + 2);
-      ctx.lineTo(x, y + 38);
-      ctx.stroke();
-    }
-  }
-
-  // 頂蓋
-  ctx.fillStyle = "#d35400";
-  ctx.beginPath();
-  ctx.moveTo(-110, -35);
-  ctx.lineTo(0, -78);
-  ctx.lineTo(110, -35);
-  ctx.closePath();
-  ctx.fill();
-  ctx.stroke();
-  ctx.restore();
-
-  // 外鍋水位管 (右側)
-  const wx = 365;
+  // 4. 外鍋水位管 (右側)
+  const wx = 370;
   const wy = 330;
   const wh = 170;
-  ctx.fillStyle = "rgba(0,0,0,0.6)";
+  ctx.fillStyle = "rgba(0,0,0,0.65)";
   ctx.roundRect(wx, wy, 24, wh, 6);
   ctx.fill();
 
@@ -1177,17 +1133,17 @@ function drawStep4(ctx) {
   ctx.textAlign = "center";
   ctx.fillText("外鍋水", wx + 12, wy - 6);
 
-  // 蒸煮進度
+  // 5. 蒸煮進度
   const bx = 45;
   const by = 210;
   const bw = 330;
-  ctx.fillStyle = "rgba(0,0,0,0.6)";
+  ctx.fillStyle = "rgba(0,0,0,0.65)";
   ctx.roundRect(bx, by, bw, 20, 8);
   ctx.fill();
   ctx.fillStyle = "#2ecc71";
   ctx.fillRect(bx + 2, by + 2, (bw - 4) * (s.cook / 100), 16);
 
-  // 補水大按鈕
+  // 6. 補水大按鈕
   ctx.fillStyle = s.holdingWater ? "#2980b9" : "#3498db";
   ctx.beginPath();
   ctx.roundRect(75, 630, 270, 60, 16);
@@ -1211,21 +1167,21 @@ function handlePointerStep4(type, x, y) {
 }
 
 // ---------------------------------------------------------
-// ⑥ 竹籤驗收 (指針進入綠區時精準點擊，驗證不沾黏)
+// ⑥ 竹籤驗收 (整塊菜頭粿 + 竹籤指針判定)
 // ---------------------------------------------------------
 function initStep5() {
   const ts = LEVELS[Game.levelIdx].timeScale;
   Game.stepMaxTime = 6.5 * ts;
   Game.stepTimer = Game.stepMaxTime;
   Game.bossMood = "NORMAL";
-  Game.bossSpeech = "「竹籤針試法！插下去拔出不沾黏才是熟透！」";
+  Game.bossSpeech = "「竹籤針試法！插下去拔出不沾生漿才是熟透！」";
 
   Game.stepState = {
     needle: 0,
     dir: 1,
     plunged: false,
     skewerY: 0,
-    speed: 1.1 / ts
+    speed: 1.15 / ts
   };
 }
 
@@ -1236,69 +1192,46 @@ function updateStep5(dt) {
     if (s.needle >= 1.0) { s.needle = 1.0; s.dir = -1; }
     else if (s.needle <= 0) { s.needle = 0; s.dir = 1; }
   } else {
-    s.skewerY = Math.min(85, s.skewerY + dt * 280);
+    s.skewerY = Math.min(85, s.skewerY + dt * 290);
   }
 }
 
 function drawStep5(ctx) {
   const s = Game.stepState;
-  drawBackdrop(ctx, Assets.kitchenScene, 0.45);
+  drawBackdrop(ctx, Sprites.bgKitchen, 0.4);
 
-  // 熱騰騰出爐菜頭粿
-  ctx.save();
-  ctx.translate(210, 480);
+  // 1. 出爐整塊菜頭粿 (Sprite)
+  drawSprite(ctx, Sprites.cakeBlock, 210, 490, 300, 200);
 
-  ctx.fillStyle = "#bdc3c7";
-  ctx.beginPath();
-  ctx.ellipse(0, 30, 160, 75, 0, 0, Math.PI * 2);
-  ctx.fill();
+  // 2. 懸掛竹籤 (Sprite) 動畫
+  const sy = 330 + s.skewerY;
+  drawSprite(ctx, Sprites.skewer, 210, sy, 35, 170);
 
-  ctx.fillStyle = "#ffffff";
-  ctx.beginPath();
-  ctx.ellipse(0, 15, 145, 65, 0, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.strokeStyle = "#ecf0f1";
-  ctx.lineWidth = 4;
-  ctx.stroke();
-
-  // 竹籤動畫
-  const sy = -130 + s.skewerY;
-  ctx.fillStyle = "#d29054";
-  ctx.beginPath();
-  ctx.moveTo(-4, sy);
-  ctx.lineTo(4, sy);
-  ctx.lineTo(1, sy + 115);
-  ctx.lineTo(0, sy + 120);
-  ctx.lineTo(-1, sy + 115);
-  ctx.closePath();
-  ctx.fill();
-  ctx.restore();
-
-  // 精密時機條
+  // 3. 時機判定條
   const bx = 45;
   const by = 240;
   const bw = 330;
   const bh = 28;
 
-  ctx.fillStyle = "rgba(0,0,0,0.6)";
+  ctx.fillStyle = "rgba(0,0,0,0.65)";
   ctx.roundRect(bx, by, bw, bh, 10);
   ctx.fill();
 
   // 半生紅區 (0 ~ 45%)
-  ctx.fillStyle = "rgba(231,76,60,0.4)";
+  ctx.fillStyle = "rgba(231,76,60,0.45)";
   ctx.fillRect(bx, by, bw * 0.45, bh);
 
   // 綠區 (45% ~ 65%)
   const gzx = bx + bw * 0.45;
   const gzw = bw * 0.2;
-  ctx.fillStyle = "rgba(46,204,113,0.7)";
+  ctx.fillStyle = "rgba(46,204,113,0.75)";
   ctx.fillRect(gzx, by, gzw, bh);
   ctx.strokeStyle = "#2ecc71";
   ctx.lineWidth = 3;
   ctx.strokeRect(gzx, by, gzw, bh);
 
-  // 過熟硬區 (65% ~ 100%)
-  ctx.fillStyle = "rgba(230,126,34,0.4)";
+  // 過熟老化區 (65% ~ 100%)
+  ctx.fillStyle = "rgba(230,126,34,0.45)";
   ctx.fillRect(bx + bw * 0.65, by, bw * 0.35, bh);
 
   // 擺動指針
@@ -1340,7 +1273,7 @@ function handlePointerStep5(type, x, y) {
 }
 
 // ---------------------------------------------------------
-// ⑦ 切塊出貨 (劃 3 刀直線 ＋ 向上滑動甩上發財車)
+// ⑦ 切塊出貨 (劃 3 刀直線 ＋ 盛盤甩上三輪發財車)
 // ---------------------------------------------------------
 function initStep6() {
   const ts = LEVELS[Game.levelIdx].timeScale;
@@ -1364,7 +1297,7 @@ function updateStep6(dt) {
   if (s.subPhase === "FLICK" && s.plateVy < 0) {
     s.plateY += s.plateVy * dt;
     s.plateVy += 320 * dt;
-    if (s.plateY <= -170 && !s.delivered) {
+    if (s.plateY <= -240 && !s.delivered) {
       s.delivered = true;
       AudioSys.fanfare();
       finishCurrentStep("PERFECT", "完美上車！客人搶購一空！");
@@ -1376,90 +1309,45 @@ function drawStep6(ctx) {
   const s = Game.stepState;
 
   if (s.subPhase === "SLICE") {
-    drawBackdrop(ctx, Assets.prep, 0.45);
+    drawBackdrop(ctx, Sprites.bgPrep, 0.4);
 
-    // 木砧板
-    ctx.save();
-    ctx.translate(210, 440);
-    ctx.fillStyle = "#8d5b32";
-    ctx.roundRect(-150, -110, 300, 220, 14);
-    ctx.fill();
+    // 1. 菜頭粿本體 (Sprite) 在木砧板上
+    drawSprite(ctx, Sprites.cakeBlock, 210, 450, 310, 210);
 
-    // 菜頭粿本體
-    ctx.fillStyle = "#fdfbf7";
-    ctx.roundRect(-120, -85, 240, 170, 8);
-    ctx.fill();
-    ctx.strokeStyle = "#e8dfd0";
-    ctx.lineWidth = 3;
-    ctx.stroke();
-
-    // 3 刀指引虛線
-    ctx.strokeStyle = "rgba(192, 57, 43, 0.45)";
+    // 2. 指引虛線
+    ctx.strokeStyle = "rgba(192, 57, 43, 0.55)";
     ctx.lineWidth = 3;
     ctx.setLineDash([8, 6]);
     for (let i = 1; i <= 3; i++) {
-      const sx = -120 + i * 60;
+      const sx = 100 + i * 55;
       ctx.beginPath();
-      ctx.moveTo(sx, -85);
-      ctx.lineTo(sx, 85);
+      ctx.moveTo(sx, 370);
+      ctx.lineTo(sx, 530);
       ctx.stroke();
     }
     ctx.setLineDash([]);
 
-    // 已切刀痕
+    // 3. 已切刀痕
     for (const sl of s.sliceLines) {
       ctx.strokeStyle = "#c0392b";
       ctx.lineWidth = 4;
       ctx.beginPath();
-      ctx.moveTo(sl.x1 - 210, sl.y1 - 440);
-      ctx.lineTo(sl.x2 - 210, sl.y2 - 440);
+      ctx.moveTo(sl.x1, sl.y1);
+      ctx.lineTo(sl.x2, sl.y2);
       ctx.stroke();
     }
-    ctx.restore();
 
     drawStepBanner(ctx, `🔪 刀工切塊：${s.slices} / 3 刀`, STEPS[6].actionHint);
   } else {
     // 發財車出貨階段
-    drawBackdrop(ctx, Assets.truck, 0.4);
+    drawBackdrop(ctx, Sprites.bgKitchen, 0.4);
 
-    // 發財車後斗目標區
-    ctx.save();
-    ctx.translate(210, 240);
-    ctx.fillStyle = "#2980b9";
-    ctx.roundRect(-110, -50, 220, 90, 12);
-    ctx.fill();
-    ctx.strokeStyle = "#1a5276";
-    ctx.lineWidth = 4;
-    ctx.stroke();
+    // 1. 藍色三輪發財車 (Sprite) 在上方
+    drawSprite(ctx, Sprites.truck, 210, 260, 260, 230);
 
-    ctx.fillStyle = "#fff";
-    ctx.font = "900 17px sans-serif";
-    ctx.textAlign = "center";
-    ctx.fillText("🚚 藍色發財車 (目標區)", 0, 5);
-    ctx.restore();
-
-    // 盛盤菜頭粿 (隨甩動向上飛出)
-    ctx.save();
-    ctx.translate(210, 560 + s.plateY);
-
-    ctx.fillStyle = "#fff";
-    ctx.beginPath();
-    ctx.ellipse(0, 0, 100, 60, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.strokeStyle = "#bdc3c7";
-    ctx.lineWidth = 3;
-    ctx.stroke();
-
-    // 切塊淋醬
-    for (let c = -60; c <= 60; c += 35) {
-      ctx.fillStyle = "#f5cd79";
-      ctx.fillRect(c - 12, -18, 24, 34);
-      ctx.fillStyle = "#5c2c16"; // 醬油膏
-      ctx.fillRect(c - 8, -10, 16, 6);
-      ctx.fillStyle = "#e74c3c"; // 甜辣醬
-      ctx.fillRect(c - 5, -2, 10, 4);
-    }
-    ctx.restore();
+    // 2. 盛盤切塊菜頭粿 (Sprite) 隨甩動向上飛入發財車
+    const py = 560 + s.plateY;
+    drawSprite(ctx, Sprites.plate, 210, py, 260, 180);
 
     drawStepBanner(ctx, "🚚 裝盤出貨：向上滑動甩上發財車！", "快把盤子「向上滑甩進發財車後斗」！");
   }
@@ -1595,10 +1483,21 @@ function evaluateCurrentBatch() {
 }
 
 /* =========================================================
-   8. 突發干擾事件 (老鼠突襲 ＆ 客人急躁催單)
+   8. 突發干擾事件 (老鼠突襲 ＆ 客人催單 ＆ 雙籠蒸煮)
 ========================================================= */
 function updateDistractions(dt) {
   const lv = LEVELS[Game.levelIdx];
+
+  // Level 3 雙籠蒸煮機制：背景蒸籠水溫消耗
+  if (Game.dualSteamer.active) {
+    Game.dualSteamer.water = Math.max(0, Game.dualSteamer.water - dt * 6.5);
+    if (Game.dualSteamer.water < 20) {
+      Game.dualSteamer.dryWarning = true;
+    } else {
+      Game.dualSteamer.dryWarning = false;
+    }
+  }
+
   if (!lv.hasRats && !lv.hasCustomers) return;
 
   Game.distractionTimer -= dt;
@@ -1642,16 +1541,31 @@ function updateDistractions(dt) {
 }
 
 function drawDistractions(ctx) {
+  // 1. Level 3 頂部背景蒸籠狀態卡
+  if (Game.dualSteamer.active) {
+    ctx.save();
+    ctx.fillStyle = Game.dualSteamer.dryWarning ? "rgba(231,76,60,0.85)" : "rgba(33, 19, 11, 0.85)";
+    ctx.roundRect(GW - 130, 115, 115, 45, 8);
+    ctx.fill();
+    ctx.strokeStyle = "#f39c12";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    drawSprite(ctx, Sprites.steamer, GW - 110, 137, 34, 34);
+    ctx.fillStyle = "#fff";
+    ctx.font = "900 11px sans-serif";
+    ctx.textAlign = "left";
+    ctx.fillText("第1籠蒸煮", GW - 90, 132);
+    ctx.fillText(`水:${Math.round(Game.dualSteamer.water)}% (點補)`, GW - 90, 148);
+    ctx.restore();
+  }
+
+  // 2. 老鼠 (真實 Sprite 貼圖) 與催單客人
   for (const d of Game.distractions) {
     if (!d.alive) continue;
     if (d.type === "RAT") {
-      ctx.fillStyle = "#2c3e50";
-      ctx.beginPath();
-      ctx.ellipse(d.x, d.y, 22, 12, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.font = "24px sans-serif";
-      ctx.textAlign = "center";
-      ctx.fillText("🐭", d.x, d.y + 7);
+      const angle = d.vx > 0 ? 0 : Math.PI;
+      drawSprite(ctx, Sprites.rat, d.x, d.y, 65, 52, 0);
     } else if (d.type === "CUSTOMER") {
       ctx.fillStyle = "#c0392b";
       ctx.beginPath();
@@ -1670,6 +1584,15 @@ function drawDistractions(ctx) {
 }
 
 function checkDistractionTap(x, y) {
+  // 檢查 Level 3 蒸籠快速補水
+  if (Game.dualSteamer.active && x >= GW - 130 && x <= GW - 15 && y >= 115 && y <= 160) {
+    Game.dualSteamer.water = Math.min(100, Game.dualSteamer.water + 35);
+    AudioSys.waterSplash();
+    addFloatingNotice("💧 背景籠補水完成！", GW - 70, 180, "#3498db");
+    return true;
+  }
+
+  // 檢查老鼠或客人
   for (let i = Game.distractions.length - 1; i >= 0; i--) {
     const d = Game.distractions[i];
     if (!d.alive) continue;
@@ -1695,7 +1618,7 @@ function checkDistractionTap(x, y) {
    9. 視覺繪製輔助 (Backdrop, Banner, Gauges, Boss Avatar)
 ========================================================= */
 function drawBackdrop(ctx, img, opacity = 0.5) {
-  if (img.complete && img.naturalWidth > 0) {
+  if (img && img.complete && img.naturalWidth > 0) {
     ctx.save();
     ctx.globalAlpha = opacity;
     ctx.drawImage(img, 0, 0, GW, GH);
@@ -1704,12 +1627,11 @@ function drawBackdrop(ctx, img, opacity = 0.5) {
 }
 
 function drawStepBanner(ctx, title, hint) {
-  // 提示卡
-  ctx.fillStyle = "rgba(18, 10, 5, 0.88)";
+  ctx.fillStyle = "rgba(18, 10, 5, 0.9)";
   ctx.roundRect(20, 115, 380, 72, 14);
   ctx.fill();
   ctx.strokeStyle = "#c88a4b";
-  ctx.lineWidth = 2;
+  ctx.lineWidth = 2.5;
   ctx.stroke();
 
   ctx.fillStyle = "#ffffff";
@@ -1724,18 +1646,18 @@ function drawStepBanner(ctx, title, hint) {
 
 function drawSpeedGauge(ctx, x, y, w, h, ratio) {
   ctx.save();
-  ctx.fillStyle = "rgba(0,0,0,0.6)";
+  ctx.fillStyle = "rgba(0,0,0,0.65)";
   ctx.roundRect(x, y, w, h, 6);
   ctx.fill();
 
   // 綠區
   const gy = y + h * (1 - 0.85);
   const gh = h * 0.63;
-  ctx.fillStyle = "rgba(46,204,113,0.55)";
+  ctx.fillStyle = "rgba(46,204,113,0.6)";
   ctx.fillRect(x, gy, w, gh);
 
   // 紅區 (危險太快)
-  ctx.fillStyle = "rgba(231,76,60,0.65)";
+  ctx.fillStyle = "rgba(231,76,60,0.7)";
   ctx.fillRect(x, y, w, h * 0.15);
 
   // 指標
@@ -1752,14 +1674,14 @@ function drawSpeedGauge(ctx, x, y, w, h, ratio) {
 
 function drawThermometer(ctx, x, y, w, h, temp, minG, maxG) {
   ctx.save();
-  ctx.fillStyle = "rgba(0,0,0,0.6)";
+  ctx.fillStyle = "rgba(0,0,0,0.65)";
   ctx.roundRect(x, y, w, h, 6);
   ctx.fill();
 
   // 綠區
   const gy = y + h * (1 - maxG / 100);
   const gh = h * ((maxG - minG) / 100);
-  ctx.fillStyle = "rgba(46,204,113,0.6)";
+  ctx.fillStyle = "rgba(46,204,113,0.65)";
   ctx.fillRect(x, gy, w, gh);
 
   // 當前溫度條
@@ -1778,7 +1700,7 @@ function drawHUD(ctx) {
   const lv = LEVELS[Game.levelIdx];
   const step = STEPS[Game.stepIdx];
 
-  // 頂部儀表板
+  // 頂部儀表底板
   ctx.fillStyle = "rgba(18, 10, 5, 0.95)";
   ctx.fillRect(0, 0, GW, 105);
 
@@ -1792,7 +1714,7 @@ function drawHUD(ctx) {
   ctx.textAlign = "right";
   ctx.fillText(`💰 營收：$${Game.totalScore}`, GW - 16, 28);
 
-  // 7 步驟進度膠囊 (Step Pills)
+  // 7 步驟進度膠囊
   const pillW = 44;
   const pillStartX = 18;
   for (let i = 0; i < 7; i++) {
@@ -1837,43 +1759,22 @@ function drawHUD(ctx) {
 }
 
 function drawBossAvatarBubble(ctx) {
-  // 右下角包老闆頭像與台詞氣泡
-  const bx = GW - 55;
-  const by = GH - 45;
-
-  ctx.save();
-  ctx.fillStyle = "#1e120d";
-  ctx.beginPath();
-  ctx.arc(bx, by, 32, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.strokeStyle = "#c82829";
-  ctx.lineWidth = 3;
-  ctx.stroke();
-
-  // 頭像裁切
-  ctx.save();
-  ctx.beginPath();
-  ctx.arc(bx, by, 30, 0, Math.PI * 2);
-  ctx.clip();
-  const avatarImg = Game.bossMood === "PANIC" ? Assets.bossPanic : Assets.bossBack;
-  if (avatarImg.complete && avatarImg.naturalWidth > 0) {
-    ctx.drawImage(avatarImg, bx - 30, by - 30, 60, 60);
-  }
-  ctx.restore();
+  // 右下角包老闆透明貼圖立繪（正常端盤 / 失控起火）
+  const avatarImg = Game.bossMood === "PANIC" ? Sprites.bossPanic : Sprites.heroBoss;
+  drawSprite(ctx, avatarImg, GW - 45, GH - 45, 80, 80);
 
   // 漫畫對話氣泡
-  ctx.fillStyle = "rgba(255,255,255,0.92)";
-  ctx.roundRect(20, GH - 62, GW - 120, 36, 12);
+  ctx.fillStyle = "rgba(255,255,255,0.94)";
+  ctx.roundRect(16, GH - 62, GW - 110, 38, 12);
   ctx.fill();
-  ctx.strokeStyle = "#4a2815";
-  ctx.lineWidth = 2;
+  ctx.strokeStyle = "#3e200e";
+  ctx.lineWidth = 2.5;
   ctx.stroke();
 
-  ctx.fillStyle = "#231710";
+  ctx.fillStyle = "#21130b";
   ctx.font = "900 12.5px sans-serif";
   ctx.textAlign = "left";
-  ctx.fillText(Game.bossSpeech, 30, GH - 40);
-  ctx.restore();
+  ctx.fillText(Game.bossSpeech, 26, GH - 38);
 }
 
 function addFloatingNotice(text, x, y, color = "#fff") {
@@ -1926,6 +1827,11 @@ function gameLoop(now) {
         const lv = LEVELS[Game.levelIdx];
         Game.batchIdx++;
         if (Game.batchIdx < lv.batches) {
+          // Level 3 啟動雙籠蒸煮
+          if (Game.levelIdx === 2) {
+            Game.dualSteamer.active = true;
+            Game.dualSteamer.water = 85;
+          }
           initStep(0);
         } else {
           finishGame();
@@ -1953,7 +1859,7 @@ function renderGameCanvas() {
   const ctx = Game.ctx;
 
   // 清除背景
-  ctx.fillStyle = "#150d08";
+  ctx.fillStyle = "#140b06";
   ctx.fillRect(0, 0, Game.canvas.width, Game.canvas.height);
 
   ctx.save();
@@ -1969,8 +1875,8 @@ function renderGameCanvas() {
     Game.shakeTime = Math.max(0, Game.shakeTime - 0.8);
   }
 
-  // 預設底色
-  ctx.fillStyle = "#2c1d12";
+  // 底色
+  ctx.fillStyle = "#24150d";
   ctx.fillRect(0, 0, GW, GH);
 
   // 步驟具體繪製
@@ -1984,13 +1890,13 @@ function renderGameCanvas() {
     case 6: drawStep6(ctx); break;
   }
 
-  // 干擾事件
+  // 干擾事件 (老鼠 / 客人 / 雙籠蒸煮)
   drawDistractions(ctx);
 
-  // HUD
+  // 頂部 HUD
   drawHUD(ctx);
 
-  // 包老闆頭像與語音泡泡
+  // 包老闆頭像與台詞氣泡
   drawBossAvatarBubble(ctx);
 
   // 浮動文字
@@ -2025,6 +1931,7 @@ function startGame() {
   Game.completedBatches = [];
   Game.distractions = [];
   Game.distractionTimer = 3.5;
+  Game.dualSteamer.active = false;
   Game.running = true;
 
   showScreen("screen-play");
@@ -2051,8 +1958,11 @@ function finishGame() {
 
   showScreen("screen-result");
 
-  const poster = document.getElementById("result-poster-img");
-  poster.src = passed ? "assets/ui_win.jpg" : "assets/ui_lose.jpg";
+  const posterBg = document.getElementById("result-poster-bg");
+  if (posterBg) posterBg.src = passed ? "assets/ui_win.jpg" : "assets/ui_lose.jpg";
+
+  const bossSticker = document.getElementById("result-boss-sticker");
+  if (bossSticker) bossSticker.src = passed ? "assets/sprites/hero_boss.png" : "assets/sprites/boss_panic.png";
 
   document.getElementById("result-star-row").textContent = passed ? "★".repeat(stars) + "☆".repeat(3 - stars) : "☆☆☆";
   document.getElementById("result-main-title").textContent = passed ? "通關成功！大豐收！" : "虧損！手忙腳亂收攤！";
@@ -2108,8 +2018,7 @@ function renderLevelSelection() {
   container.innerHTML = LEVELS.map((lv, idx) => `
     <div class="level-card ${idx === Game.levelIdx ? "selected" : ""}" data-idx="${idx}">
       <div class="level-badge-box">
-        <span class="level-badge-id">Lv.${lv.id}</span>
-        <span class="level-badge-icon">${idx === 0 ? "🏮" : idx === 1 ? "🌙" : "🧧"}</span>
+        <img src="assets/sprites/${idx === 0 ? "radish" : idx === 1 ? "wok" : "steamer"}.png" class="level-badge-img" alt="${lv.name}" />
       </div>
       <div class="level-content">
         <div class="level-header-row">
